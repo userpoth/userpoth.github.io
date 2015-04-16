@@ -1,0 +1,112 @@
+/********************************************************/
+/* tilebasedgametutorials.css. Frank Poth. 04/16/2015. */
+/******************************************************/
+
+body, html {
+	background: url("tilebasedgametutorialsbackground.png");
+	height: 100%;
+	margin: 0px;
+	/* Stops the address bar from causing a scroll jump, however it is now always visible. */
+	overflow-y:scroll;
+	padding: 0px;
+	width: 100%;
+}
+
+/* Content div id. */
+#content {
+	background-color: rgba(255,255,255,0.8);
+	border-radius: 16px 16px 16px 16px;
+	margin: 8px 8px 8px 8px;
+	min-height: 900px;
+	position:relative;
+	text-align:justify;
+}
+
+#content h2 {
+	color: #004080;
+	line-height: 48px;
+	margin: 0px 8px 0px 8px;
+	padding: 0px;
+}
+
+#content a {
+	color: #0080f0;
+	text-decoration: none;
+}
+
+#content p {
+	color: #202020;
+	line-height: 24px;
+	margin: 0px 8px 24px 8px;
+	padding: 0px;
+}
+
+#content span {
+	color: #f08000
+}
+
+#center_link{
+	bottom:8px;
+	left:50%;
+	position:absolute;
+	transform:translateX(-50%);
+}
+
+#left_link{
+	bottom:8px;
+	left:8px;
+	position:absolute;
+}
+
+#right_link{
+	bottom:8px;
+	right:8px;
+	position:absolute;
+}
+
+/* Footer div id. */
+#footer {
+	background-color: rgba(32,32,32,0.9);
+	border-radius: 24px 24px 0px 0px;
+	height: 48px;
+	text-align: center;
+	width: 100%;
+}
+
+#footer a {
+	color: #0080f0;
+	line-height: 48px;
+	text-decoration: none;
+}
+
+/* Header div id. */
+#header {
+	background-color: rgba(32,32,32,0.9);
+	border-radius: 0px 0px 24px 24px;
+	height: 48px;
+	text-align: center;
+	width: 100%;
+}
+
+#header h2 {
+	color: #f08000;
+	line-height: 48px;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Defines styles on real live canvas elements! */
+.Canvas{
+	clear:both;
+	display:block;
+	margin:0px 0px 24px 0px;
+	padding:0px;
+	position:relative;
+	left:0px;
+	vertical-align:top;
+}
+
+/* Put this baby on images to make them dissapear! */
+.Image{
+	display:none;
+}

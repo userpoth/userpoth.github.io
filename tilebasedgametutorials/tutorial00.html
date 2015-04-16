@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<!---------------------------------------------->
+<!-- tutorial00.html. Frank Poth. 04/16/2015. -->
+<!---------------------------------------------->
+
+<!-- Welcome to the first tutorial! -->
+<!-- Pretty much everything interesting is in the JavaScript file, so you should go look at that. -->
+<!-- Most of these HTML pages are pretty much identical. -->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Link. -->
+		<link href="tilebasedgametutorials.css" rel="stylesheet" type="text/css">
+		<!-- Meta. -->
+		<!-- Keeps the device pixel ratio as constant as possible on all devices. -->
+		<meta content="width=device-width" name="viewport">
+		<!-- Title. -->
+		<title>Tile Based Game Tutorials | Tutorial00</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<!-- Header. -->
+		<div id="header">
+			<h2>Tile Based Game Tutorials</h2>
+		</div>
+		<!-- Content. -->
+		<div id="content">
+			<h2> Tutorial00 </h2>
+			<p>
+				Welcome to the first example in the series. All it does is draw a tile map to the display canvas. There's not really a whole lot to explain, but I will give it a shot. If you really want an in depth look at what's going on, take a look at the very heavily commented source code. It's all in tutorial00.js, so go to view source or inspect element or to the GitHub repository and check it out. But first take a look at this breathtakingly sparse tile map:
+			</p>
+			<canvas class="Canvas" id="display"></canvas>
+			<p>
+				Anyway, what's happening here is a drawing function loops over a one dimensional array of tile values. A 1 in the array indicates a gray tile and a 0 indicates no tile at all. There's only one tile graphic (which is also available in the source under the same name as the example) and it's that gray square. While looping over the tile map array, the draw function checks each value and draws a gray square if that value is 1.
+			</p>
+			<p>
+				But how does the draw function know where to draw the gray square on the two dimensional map if it's getting its information from a one dimensional array? Well, that's where the <span>destination_x</span> and <span>destination_y</span> values come in. Here's one now:
+			</p>
+			<p>
+				<span>var destination_x = (index % map.columns) * tile_width;</span> Where index is the current increment in the loop.
+			</p>
+			<p>
+				Let's put some values in there:
+			</p>
+			<p>
+				(0 % 16) * 16 = 0 * 16 = 0;
+			</p>
+			<p>
+				(8 % 16) * 16 = 8 * 16 = 128;
+			</p>
+			<p>
+				(16 % 16) * 16 = 0 * 16 = 0;
+			</p>
+			<p>
+				(20 % 16) * 16 = 4 * 16 = 64;
+			</p>
+			<p>
+				The first part that uses modulus gets the column and the second part just multiplies by tile width.
+			</p>
+			<p>
+				<span>var destination_y = Math.floor(index / map.columns) * tile_height;</span>
+			</p>
+			<p>
+				Math.floor(0 / 16) * 16 = 0 * 16 = 0;
+			</p>
+			<p>
+				Math.floor(16 / 16) * 16 = 1 * 16 = 16;
+			</p>
+			<p>
+				Math.floor(20 / 16) * 16 = 1 * 16 = 16;
+			</p>
+			<p>
+				The first part gets the row and the second part multiplies by tile height.
+			</p>
+			<p>
+				In this way you can determine where the physical x y coordinates of a tile are in a two dimensional world using a one dimensional map.
+			</p>
+			<br>
+			<a id="left_link" href="introduction.html">Introduction</a>
+			<a id="center_link" href="index.html">Index</a>
+		</div>
+		<!-- Footer. -->
+		<div id="footer">
+			<a href="https://github.com/userpoth/tilebasedgametutorials">GitHub Repository</a>
+		</div>
+		<!-- Image. -->
+		<img class="Image" id="image" src="tutorial00.png">
+		<!-- Script. -->
+		<script src="tutorial00.js" type="text/javascript"></script>
+	</body>
+</html>

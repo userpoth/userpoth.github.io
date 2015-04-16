@@ -2,6 +2,24 @@
 /* index.css. Frank Poth. 04/15/2015. */
 /*************************************/
 
-body,html{
-	background-color:#000000;
+a {
+	color: #0090f0;
+	text-decoration:none;
+}
+
+body, html {
+	background-color: #000000;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	text-align:center;
+	width: 100%;
+}
+
+h1 {
+	color: #f0f0f0;
+}
+
+p{
+	color:#f0f0f0;
 }
