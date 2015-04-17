@@ -30,53 +30,32 @@
 		<div id="content">
 			<h2> Tutorial00 </h2>
 			<p>
-				Welcome to the first example in the series. All it does is draw a tile map to the display canvas. There's not really a whole lot to explain, but I will give it a shot. If you really want an in depth look at what's going on, take a look at the very heavily commented source code. It's all in tutorial00.js, so go to view source or inspect element or to the GitHub repository and check it out. But first take a look at this breathtakingly sparse tile map:
+				Welcome to the first example! It doesn't do much at all so don't try interacting with it. All you need to do is observe the breathtaking beauty of gray squares on a white background. Of course, if you were making a real game, you'd have lots of cool graphics and animations populating the screen, but for the purposes of this tutorial, I didn't think frill was necessary. I hope you like gray.
 			</p>
 			<canvas class="Canvas" id="display"></canvas>
 			<p>
-				Anyway, what's happening here is a drawing function loops over a one dimensional array of tile values. A 1 in the array indicates a gray tile and a 0 indicates no tile at all. There's only one tile graphic (which is also available in the source under the same name as the example) and it's that gray square. While looping over the tile map array, the draw function checks each value and draws a gray square if that value is 1.
+				Alright, so, now that you've seen the map, let's examine how it works. It's nothing complicated: just an array of tile values, a for loop, and the one and only drawImage method used to draw the gray square image to the canvas. The important thing to understand is how to calculate row and column positions in your map given a specific index.
 			</p>
 			<p>
-				But how does the draw function know where to draw the gray square on the two dimensional map if it's getting its information from a one dimensional array? Well, that's where the <span>destination_x</span> and <span>destination_y</span> values come in. Here's one now:
+				This map has 16 columns and 16 rows. You could say that the very first tile is located at index: 0, which is the one dimensional approach to the tile map. You could also say the first tile is located at row: 0, column: 0, which is the two dimensional approach. In order to draw the tiles you see above in two dimensions, you just need to convert index to columns and rows. Here's how:
+			</p>
+			<p class="Math">
+				column = index % map.columns
+			</p>
+			<p class="Math">
+				row = Math.floor( index / map.columns )
 			</p>
 			<p>
-				<span>var destination_x = (index % map.columns) * tile_width;</span> Where index is the current increment in the loop.
+				Now that you have the row and column of the tile at a given index in the map, you can multiply by the tile size to get its physical location on the canvas:
+			</p>
+			<p class="Math">
+				x = ( index % map.columns ) * tile_width
+			</p>
+			<p class="Math">
+				y = Math.floor( index / map.columns ) * tile_height
 			</p>
 			<p>
-				Let's put some values in there:
-			</p>
-			<p>
-				(0 % 16) * 16 = 0 * 16 = 0;
-			</p>
-			<p>
-				(8 % 16) * 16 = 8 * 16 = 128;
-			</p>
-			<p>
-				(16 % 16) * 16 = 0 * 16 = 0;
-			</p>
-			<p>
-				(20 % 16) * 16 = 4 * 16 = 64;
-			</p>
-			<p>
-				The first part that uses modulus gets the column and the second part just multiplies by tile width.
-			</p>
-			<p>
-				<span>var destination_y = Math.floor(index / map.columns) * tile_height;</span>
-			</p>
-			<p>
-				Math.floor(0 / 16) * 16 = 0 * 16 = 0;
-			</p>
-			<p>
-				Math.floor(16 / 16) * 16 = 1 * 16 = 16;
-			</p>
-			<p>
-				Math.floor(20 / 16) * 16 = 1 * 16 = 16;
-			</p>
-			<p>
-				The first part gets the row and the second part multiplies by tile height.
-			</p>
-			<p>
-				In this way you can determine where the physical x y coordinates of a tile are in a two dimensional world using a one dimensional map.
+				And that's how you draw a two dimensional level from a one dimensional map. You can also use a two dimensional array to store tile maps, but that comes with extra overhead. For instance, this very small level uses one array object to store the map. A two dimensional array would need 16 arrays (one for each row or column) as well as one more to hold all of those, so 17 in all. Now just imagine bigger maps and multiple levels. In all honesty, it's probably not so much overhead, but to me it just seems like clutter.
 			</p>
 			<br>
 			<a id="left_link" href="introduction.html">Introduction</a>
@@ -86,8 +65,6 @@
 		<div id="footer">
 			<a href="https://github.com/userpoth/tilebasedgametutorials">GitHub Repository</a>
 		</div>
-		<!-- Image. -->
-		<img class="Image" id="image" src="tutorial00.png">
 		<!-- Script. -->
 		<script src="tutorial00.js" type="text/javascript"></script>
 	</body>

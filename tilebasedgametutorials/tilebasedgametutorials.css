@@ -106,7 +106,11 @@ body, html {
 	vertical-align:top;
 }
 
-/* Put this baby on images to make them dissapear! */
-.Image{
-	display:none;
+/* Style for a math snippet */
+.Math{
+	background-color:#606060;
+	color:#f0f0f0 !important;
+	overflow-x:scroll;
+	padding:0px 8px 0px 8px !important;
+	white-space:nowrap;
 }
