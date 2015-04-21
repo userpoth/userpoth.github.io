@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<!---------------------------------------------->
+<!-- tutorial01.html. Frank Poth. 04/17/2015. -->
+<!---------------------------------------------->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Link. -->
+		<link href="tilebasedgametutorials.css" rel="stylesheet" type="text/css">
+		<!-- Meta. -->
+		<meta content="width=device-width" name="viewport">
+		<!-- Title. -->
+		<title>Tile Based Game Tutorials | Tutorial01</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<!-- Header. -->
+		<div id="header">
+			<h2>Tile Based Game Tutorials</h2>
+		</div>
+		<!-- Content. -->
+		<div id="content">
+			<h2> More Graphics </h2>
+			<p>
+				In this example you can see that I added some new tile graphics to the map. Even though they're still a very dismal gray, the fact that they're not all square makes the level more appealing to look at. It's also interactive via mouse or touch, so check it out:
+			</p>
+			<canvas class="Canvas" id="display">
+				canvas
+			</canvas>
+			<p>
+				The purpose of this example is really just to show you how the index relates to column and row, but if you want an explanation on blitting multiple graphics to the screen, here it is:
+			</p>
+			<p>
+				First of all, blitting isn't a real word, but it stands for bit block transfer and what it refers to is transferring image data from one surface to another. In this case, individual tile graphics are blitted from the "source" tile sheet image to the "destination" html5 canvas. If you recall how to calculate the destination x and y position of a tile from the last example, you already know how to calculate the source x and y position of a tile graphic. Here's a section of the code to show you just how similar the two are:
+			</p>
+			<pre class="Math">var destination_column = index % this.columns;
+var destination_row = Math.floor(index / this.columns);
+var destination_x = destination_column * tile_sheet.tile_width;
+var destination_y = destination_row * tile_sheet.tile_height;
+
+var source_column = value % tile_sheet.columns;
+var source_row = Math.floor(value / tile_sheet.columns);
+var source_x = source_column * tile_sheet.tile_width;
+var source_y = source_row * tile_sheet.tile_height;</pre>
+			<p>
+				As you can see, they're basically the same. The only difference is that destination uses "index" which refers to a unique space on the tile map and source uses "value" which refers to a unique space in the tile sheet. The actual blitting is then done by drawImage using the source and destination information.
+			</p>
+			<p>
+				So, that's how it's done. I'd write some more about it, but there's really not much to say. As always, you have full access to the commented source code so check it out.
+			</p>
+			<br>
+			<a id="left_link" href="tutorial00.html">Tutorial00</a>
+			<a id="center_link" href="index.html">Index</a>
+			<a id="right_link" href="tutorial02.html">Tutorial02</a>
+		</div>
+		<!-- This has to be placed outside of the content div because it needs to be absolutely positioned inside the body element and the content div has position:relative. -->
+		<p class="Output" id="output">
+			output
+		</p>
+		<!-- Footer. -->
+		<div id="footer">
+			<a href="https://github.com/userpoth/tilebasedgametutorials">GitHub Repository</a>
+		</div>
+		<!-- Script. -->
+		<script src="tutorial01.js" type="text/javascript"></script>
+	</body>
+</html>

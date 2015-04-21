@@ -7,7 +7,7 @@ body, html {
 	height: 100%;
 	margin: 0px;
 	/* Stops the address bar from causing a scroll jump, however it is now always visible. */
-	overflow-y:scroll;
+	/*overflow-y: scroll;*/
 	padding: 0px;
 	width: 100%;
 }
@@ -18,8 +18,8 @@ body, html {
 	border-radius: 16px 16px 16px 16px;
 	margin: 8px 8px 8px 8px;
 	min-height: 900px;
-	position:relative;
-	text-align:justify;
+	position: relative;
+	text-align: justify;
 }
 
 #content h2 {
@@ -45,23 +45,23 @@ body, html {
 	color: #f08000
 }
 
-#center_link{
-	bottom:8px;
-	left:50%;
-	position:absolute;
-	transform:translateX(-50%);
+#center_link {
+	bottom: 8px;
+	left: 50%;
+	position: absolute;
+	transform: translateX(-50%);
 }
 
-#left_link{
-	bottom:8px;
-	left:8px;
-	position:absolute;
+#left_link {
+	bottom: 8px;
+	left: 8px;
+	position: absolute;
 }
 
-#right_link{
-	bottom:8px;
-	right:8px;
-	position:absolute;
+#right_link {
+	bottom: 8px;
+	right: 8px;
+	position: absolute;
 }
 
 /* Footer div id. */
@@ -92,25 +92,35 @@ body, html {
 	color: #f08000;
 	line-height: 48px;
 	margin: 0px;
+	overflow: hidden;
 	padding: 0px;
+	white-space: nowrap;
 }
 
 /* Defines styles on real live canvas elements! */
-.Canvas{
-	clear:both;
-	display:block;
-	margin:0px 0px 24px 0px;
-	padding:0px;
-	position:relative;
-	left:0px;
-	vertical-align:top;
+.Canvas {
+	margin: 0px 0px 24px 0px;
+	padding: 0px;
+	position: relative;
+	left: 0px;
+	vertical-align: top;
+}
+
+/* Style for output p elements. */
+.Output {
+	background-color:rgba(0,0,0,0.5);
+	color:#f0f0f0 !important;
+	margin:0px !important;
+	padding:0px 8px 0px 8px;
+	pointer-events:none;
+	position: absolute;
 }
 
 /* Style for a math snippet */
-.Math{
-	background-color:#606060;
-	color:#f0f0f0 !important;
-	overflow-x:scroll;
-	padding:0px 8px 0px 8px !important;
-	white-space:nowrap;
+.Math {
+	background-color: #606060;
+	color: #f0f0f0 !important;
+	line-height:24px;
+	overflow-x: scroll;
+	padding: 0px 8px 0px 8px !important;
 }

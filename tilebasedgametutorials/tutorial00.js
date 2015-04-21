@@ -17,14 +17,35 @@
 
 		/* Draws the buffer to the display. */
 		function draw() {
-			/* Clear the display canvas. */
-			display.fillRect(0, 0, display.canvas.width, display.canvas.height);
+			/* Clear the buffer canvas. */
+			buffer.fillRect(0, 0, buffer.canvas.width, buffer.canvas.height);
 
 			/* Draw the map to the buffer. */
 			map.draw();
 
 			/* Draw the buffer to the display canvas. */
 			display.drawImage(buffer.canvas, 0, 0, buffer.canvas.width, buffer.canvas.height, 0, 0, display.canvas.width, display.canvas.height);
+		}
+
+		/* Having a resize event handler is always important when designing stuff for mobile devices because your browser window will most likely resize often. */
+		/* In each tutorial we're going to be making use of a canvas element to display stuff. */
+		/* On mobile devices, space is limited, you want to go as full screen as possible in most cases, especially for an actual game. */
+		/* For the purposes of this tutorial, I'm just going to stretch the canvas so that it's width and height are equal to the shortest dimension of the window and then center it along the longest dimension of the window. */
+		function resizeWindow(event_) {
+			var client_height = document.documentElement.clientHeight;
+			/* The display canvas is inside the content div. The width of the content div is never greater than the width of the documentElement. */
+			var client_width = html.display.parentElement.clientWidth;
+			if (client_width < client_height) {
+				html.display.height = html.display.width = client_width;
+				html.display.style.left = "0px";
+			} else {
+				html.display.height = html.display.width = client_height;
+				/* Remember, CSS doesn't like floating point values, so round down. */
+				html.display.style.left = Math.floor((client_width - client_height) * 0.5) + "px";
+			}
+
+			/* Call draw to draw the map to the display canvas. */
+			draw();
 		}
 
 		/* This loads images and performs a callback function when finished. */
@@ -47,31 +68,7 @@
 				this.removeEventListener("load", loadImage);
 				callback_();
 			}
-		}
 
-		/* Having a resize event handler is always important when designing stuff for mobile devices because your browser window will most likely resize often. */
-		/* In each tutorial we're going to be making use of a canvas element to display stuff. */
-		/* On mobile devices, space is limited, you want to go as full screen as possible in most cases, especially for an actual game. */
-		/* For the purposes of this tutorial, I'm just going to stretch the canvas so that it's width and height are equal to the shortest dimension of the window and then center it along the longest dimension of the window. */
-		function resizeWindow(event_) {
-			var client_height = document.documentElement.clientHeight;
-			/* The display canvas is inside the content div. The width of the content div is never greater than the width of the documentElement. */
-			var client_width = html.display.parentElement.clientWidth;
-			if (client_width < client_height) {
-				html.display.height = html.display.width = client_width;
-				html.display.style.left = "0px";
-			} else {
-				html.display.height = html.display.width = client_height;
-				/* Remember, CSS doesn't like floating point values, so round down. */
-				html.display.style.left = Math.floor((client_width - client_height) * 0.5) + "px";
-			}
-
-			/* The display canvas and its context have their values reset when it is resized, so you have to reset fillStyle whenever this happens. */
-			/* Drawing operations are super expensive in HTML5, especially with drawImage, so you want to use these things as sparingly as possible. */
-			/* It makes no difference in this example because we only draw on resize events, but if you're drawing often, like in a game loop, you should avoid resetting variables that haven't changed. */
-			display.fillStyle = "#ffffff";
-			/* Call draw to draw the map to the display canvas. */
-			draw();
 		}
 
 		///////////////////////
@@ -151,6 +148,8 @@
 		/* Set the dimensions of the buffer to match your map. */
 		/* You have 16 rows by 16 columns at 16px width and height, so 256px by 256px. */
 		buffer.canvas.height = buffer.canvas.width = 256;
+		/* Set the fill style for redrawing. */
+		buffer.fillStyle="#ffffff";
 
 		/* Listen for resize events. */
 		window.addEventListener("resize", resizeWindow);
