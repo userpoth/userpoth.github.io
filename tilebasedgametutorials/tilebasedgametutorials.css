@@ -2,12 +2,19 @@
 /* tilebasedgametutorials.css. Frank Poth. 04/16/2015. */
 /******************************************************/
 
-body, html {
+body {
 	background: url("tilebasedgametutorialsbackground.png");
 	height: 100%;
 	margin: 0px;
 	/* Stops the address bar from causing a scroll jump, however it is now always visible. */
 	/*overflow-y: scroll;*/
+	padding: 0px;
+	width: 100%;
+}
+
+html {
+	height: 100%;
+	margin: 0px;
 	padding: 0px;
 	width: 100%;
 }
@@ -108,11 +115,11 @@ body, html {
 
 /* Style for output p elements. */
 .Output {
-	background-color:rgba(0,0,0,0.5);
-	color:#f0f0f0 !important;
-	margin:0px !important;
-	padding:0px 8px 0px 8px;
-	pointer-events:none;
+	background-color: rgba(0,0,0,0.5);
+	color: #f0f0f0 !important;
+	margin: 0px !important;
+	padding: 0px 8px 0px 8px;
+	pointer-events: none;
 	position: absolute;
 }
 
@@ -120,7 +127,7 @@ body, html {
 .Math {
 	background-color: #606060;
 	color: #f0f0f0 !important;
-	line-height:24px;
+	line-height: 24px;
 	overflow-x: scroll;
 	padding: 0px 8px 0px 8px !important;
 }

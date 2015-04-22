@@ -29,13 +29,13 @@
 		/* These functions handle mouse input if on a pc. */
 		function mouseDownDisplay(event_) {
 			event_.preventDefault();
-			controller.move(event_.clientX, event_.clientY);
+			controller.move(event_.pageX, event_.pageY);
 			update();
 		}
 
 		function mouseMoveDisplay(event_) {
 			event_.preventDefault();
-			controller.move(event_.clientX, event_.clientY);
+			controller.move(event_.pageX, event_.pageY);
 			update();
 		}
 
@@ -97,13 +97,13 @@
 		/* These functions handle touch events if on a touch device. */
 		function touchMoveDisplay(event_) {
 			event_.preventDefault();
-			controller.move(event_.targetTouches[0].clientX, event_.targetTouches[0].clientY);
+			controller.move(event_.targetTouches[0].pageX, event_.targetTouches[0].pageY);
 			update();
 		}
 
 		function touchStartDisplay(event_) {
 			event_.preventDefault();
-			controller.move(event_.targetTouches[0].clientX, event_.targetTouches[0].clientY);
+			controller.move(event_.targetTouches[0].pageX, event_.targetTouches[0].pageY);
 			update();
 		}
 
@@ -126,8 +126,8 @@
 		var controller = {
 			/* FUNCTIONS. */
 			move : function(x_, y_) {
-				this.position.x = (x_ - this.offset.x + document.body.scrollLeft) * this.display_scale;
-				this.position.y = (y_ - this.offset.y + document.body.scrollTop) * this.display_scale;
+				this.position.x = (x_ - this.offset.x) * this.display_scale;
+				this.position.y = (y_ - this.offset.y) * this.display_scale;
 			},
 			/* OBJECT LITERALS. */
 			/* The physical page offset of the display canvas element. */
