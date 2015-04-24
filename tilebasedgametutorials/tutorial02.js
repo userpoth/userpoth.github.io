@@ -1,5 +1,5 @@
 /////////////////////////////////////////////
-/* tutorial02.js. Frank Poth. 04/23/2015. */
+/* tutorial02.js. Frank Poth. 04/22/2015. */
 ///////////////////////////////////////////
 
 /* Just presents a basic game loop using request animation frame. */
