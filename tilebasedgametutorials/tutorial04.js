@@ -311,6 +311,7 @@
 			/* VARIABLES. */
 			/* Whether or not the red square is in the air. */
 			airborne : true,
+			/* If you want a taller player object (or a wider one), that's fine, but keep it under twice the tile dimensions. */
 			height : 14,
 			last_position : new Point(16, 16),
 			position : new Point(16, 16),

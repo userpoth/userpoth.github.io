@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<!--------------------------------------------->
+<!-- webworker.html. Frank Poth. 04/26/2015. -->
+<!--------------------------------------------->
+
+<!-- In an effort to make a superb game loop using HTML5 and JavaScript, I'm researching "web workers". -->
+<!-- From what I understand they effectively open a parallel thread on which to execute non-document related code. -->
+<!-- If you use "transferable objects" you can avoid cloning data when passing info between threads. -->
+<!-- Let's see how this works... -->
+
+<!-- Well, after seeing how this works, I'm quite dissapointed. -->
+<!-- If there were some way of passing off drawing to a web worker, it would be excellent, but you can't. -->
+<!-- Unfortunately the use of postMessage itself is rather costly because it only sends duplicate data. -->
+<!-- You can also send ArrayBuffers, which is apparently much faster, but unless you are passing an image or a file, it's not very useful. -->
+<!-- Perhaps for excessively heavy computations, I'll use a web worker. Maybe for pathfinding... -->
+<!-- The awesome truth is that tile based games just aren't that expensive to run logic for! -->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Link. -->
+		<link href="webworker.css" rel="stylesheet" type="text/css">
+		<!-- Meta. -->
+		<meta content="This example uses a web worker to multi-thread a game loop." name="description">
+		<meta content="width=device-width" name="viewport">
+		<!-- Title. -->
+		<title>webworker</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<!-- The display canvas. -->
+		<canvas id="display"></canvas>
+
+		<!-- The p element used for displaying output. -->
+		<p id="output"></p>
+
+		<!-- Script. -->
+		<script src="webworkermain.js" type="text/javascript"></script>
+	</body>
+</html>

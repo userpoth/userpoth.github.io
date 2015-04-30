@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+
+<!-------------------------------------------->
+<!-- gameloop.html. Frank Poth. 04/29/2015. -->
+<!-------------------------------------------->
+
+<!-- Okay, so this is a game loop. -->
+<!-- It's a single threaded game loop. Everything happens right in the UI thread. -->
+<!-- For right now, the examples aren't very cpu intensive in the way of logic. -->
+<!-- Drawing actually takes up the vast majority of processing, and it's pretty difficult if not impossible to move actual drawing over to a web worker. -->
+<!-- If you don't know what a web worker is, it's a way to multithread JavaScript, but you have no access to DOM elements in worker threads, so drawing isn't quite possible. -->
+<!-- Anyway, this example is a pretty nifty, fully functional, single threaded game loop. -->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Links. -->
+		<link href="../tilebasedgametutorials.css" rel="stylesheet" type="text/css">
+
+		<!-- Meta. -->
+		<meta content="HTML5 and JavaScript Game Loop example implementing fixed time step and interpolation using requestAnimationFrame. Unlock your mildest dreams with consistent gameplay!" name="description">
+		<meta content="width=device-width" name="viewport">
+
+		<!-- Title. -->
+		<title>Game Loop</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<!-- Header. -->
+		<div id="header">
+			<h2>Tile Based Game Tutorials</h2>
+		</div>
+
+		<!-- Content. -->
+		<div id="content">
+			<h2>Consistent Game Loop</h2>
+			<p>
+				Working with different devices can wreak havoc on a variable time step game loop. The reason for this is that logic in a variable loop is updated at a variable speed dependent on the processor of the device it's running on. Basically, if your device is fast, your game runs fast; if it's slow, your game runs slow. This would work well if everyone used the same device, like a GameBoy for instance, but that's not what HTML5 is about. We've got to offer a cross browser, multi-platform experience and that means we need a game loop that can provide consistent updates on any device wielding a browser. This example implements such a loop:
+			</p>
+			<canvas class="Canvas" id="display"></canvas>
+			<p>
+				Fixed time steps aren't too hard to implement. This loop uses requestAnimationFrame (RAF) to handle the graphics side while a setTimeout loop handles updating the game logic at a fixed interval. This is a great approach because RAF optimizes frame rate to fit the device it's running on. That takes care of our diversity problem and it's a great example of variable time step, but there's still the problem of implementing the actual fixed time step.
+			</p>
+			<p>
+				setTimeout will call the logic function at a fixed interval. In addition, the logic function records the amount of time elapsed since the last update and adds it to a time accumulator variable. If the accumulated time is greater than or equal to the fixed interval, the logic function updates until it has made up for the accumulated time. Think of it like this: time keeps building up, and your logic function can only use fixed chunks of time per update. So if there are 50ms of accumulated time when setTimeout calls the logic function and the fixed interval is 20ms, it will update twice, taking two 20ms chunks out of the accumulated time and leaving 10ms left over. The 10ms will carry over to the next update. Have some code:
+			</p>
+			<pre class="Math">current_time = Date.now();
+elapsed_time = current_time - last_time;
+last_time = current_time;
+
+accumulated_time += elapsed_time;
+
+while (accumulated_time >= interval_) {
+	red_square.update();
+
+	accumulated_time -= interval_;
+}</pre>
+			<p>
+				If you were able to follow that confusing paragraph, you will have noticed that 10 milliseconds were basically just ignored during rendering assuming RAF rendered right after the logic function updated. This will make your animations jumpy. However, your game will update consistently on any device. If it updates one million times in an hour on your phone, it will update one million times in an hour on your desktop computer. This approach, though slightly flawed, constitutes a fixed time step game loop.
+			</p>
+			<p>
+				But those 10 milliseconds can be covered up using interpolation. All you need to do is render between the two most recent logic updates using a time step. In the case of the example above, the time step would be defined by dividing the remaining accumulated time by the fixed interval, so, 10ms/20ms, which works out to 0.5.
+			</p>
+			<p>
+				To get the interpolated position of an object, it must have access to its current and previous positions. The change between the two positions multiplied by the time step added to the previous position will result in the appropriate interpolated position. Once again, somewhat confusing, but that's why you should check out the source code. It looks like this:
+			</p>
+			<pre class="Math">var interpolated_x = this.last_position.x + (this.position.x - this.last_position.x) * time_step_;
+var interpolated_y = this.last_position.y + (this.position.y - this.last_position.y) * time_step_;</pre>
+			<p>
+				And that's pretty much it for this tutorial. Here are a few things to consider:
+			</p>
+			<p>
+				As you can see just by watching the red square for a little while, it still jitters from time to time. One major problem with JavaScript in general is that it's single threaded. That means that no matter what you do to optimize your code, your logic, input, and rendering will be happening asynchronously or one at a time; and input includes anything the user does to manipulate the browser, such as scrolling, zooming, bringing up menus, changing orientation, etc. This means that your game loop could be interrupted by any number of things, even by something as annoying as your logic and rendering loops getting in the way of each other's execution (which happens all the time).
+			</p>
+			<p>
+				One solution to this problem is implementing web workers, but it's a solution with a lot of overhead and limitations. Not only is it impossible to share object references between worker threads, web workers don't have any access to the document or the window. That means drawing to a canvas inside a web worker isn't possible, even though drawing in HTML5 is one of the most costly processes. If you must send data between web workers it requires that the data be serialized, sent, and then deserialized on the other side, effectively cloning the data. So unless you have a super large computation with a very small result, web workers aren't really a good option. A good example of where one would be useful might be path finding in a tile based world scenario due to it's high cost of computation and relatively small output. Sort of a letdown, really.
+			</p>
+			<br>
+			<a href="../tutorial00/tilemap.html" id="left_link">Tile Map</a>
+			<a href="../index.html" id="center_link">Index</a>
+			<a href="" id="right_link">Righty</a>
+		</div>
+
+		<!-- Footer. -->
+		<div id="footer">
+			<a href="">GitHub Repository</a>
+		</div>
+		<!-- The absolutely position output. -->
+		<p class="Output" id="output">
+			output
+		</p>
+
+		<!-- Script. -->
+		<script src="gameloop.js" type="text/javascript"></script>
+	</body>
+</html>

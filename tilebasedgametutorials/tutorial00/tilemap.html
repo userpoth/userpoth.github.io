@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<!------------------------------------------->
+<!-- tilemap.html. Frank Poth. 04/30/2015. -->
+<!------------------------------------------->
+
+<!-- This example draws a tile map to the display canvas using graphics from a tile sheet. -->
+<!-- The idea is to show ya'll how to set up a tile map array and then use it to display the corresponding graphics. -->
+
+<!-- HTML -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Links. -->
+		<link href="../tilebasedgametutorials.css" rel="stylesheet" type="text/css">
+
+		<!-- Meta. -->
+		<meta content="HTML5 and JavaScript Game Loop example implementing fixed time step and interpolation using requestAnimationFrame. Unlock your mildest dreams with consistent gameplay!" name="description">
+		<meta content="width=device-width" name="viewport">
+
+		<!-- Title. -->
+		<title>Tile Map</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<!-- Header. -->
+		<div id="header">
+			<h2>Tile Based Game Tutorials</h2>
+		</div>
+
+		<!-- Content. -->
+		<div id="content">
+			<h2>Draw A Tile Map</h2>
+			<p>
+				Welcome to the first example in this series of tile based tutorials. This example covers drawing tile images to the screen using a tile map, which is just an array of numbers indicating which tile graphics to draw where. As you can see in the example below, each tile space can be referenced either with a row and column or an index. Each tile space also has a value. The tile value is what's stored in the tile map array. Take a gander:
+			</p>
+			<canvas class="Canvas" id="display"></canvas>
+			<p>
+				As you can see, tile maps allow you to make complex scenes from a small set of reusable graphics. Consider the index and the value of each tile space. These two values are directly linked to the one dimensional tile map array. Say I have an array that looks like this:
+			</p>
+			<pre class="Math">var array = [ 10, 11, 12, 13 ];</pre>
+			<p>
+				That's a one dimensional array full of values. The value at index 0 is 10, the value at index 1 is 11, and so on. The example above uses the same method for referencing tile values with a much larger array: 256 tile spaces to be exact.
+			</p>
+			<p>
+				Now if I want to calculate the row and column of a given tile space in the map, I will need some more information about the map. Actually, all that is needed is the number of columns in the map. The example map has 16 columns, but lets take a look at it on a smaller scale. Back to the four valued array we go! Before accessing this array using two dimensions, let's just do a simple reformat to illustrate my point.
+			</p>
+			<pre class="Math">// Say this array represents a tile map with two columns and two rows.
+var array = [ 10, 11, 12, 13 ];
+
+// Here's the same array reformatted to illustrate two columns and two rows.
+var array = [ 10, 11,
+              12, 13 ];</pre>
+			<p>
+				As you can see, nothing has actually changed. It's still a one dimensional map. But say I want to get the value at column 0, row 0 in the map. Can you guess which value that is in the reformatted map? If you guessed 10, you were right. But simply reformatting code won't allow you to reference values this way. Like everything else you'll need some code to do the work for you. Here's how to convert a one dimensional index into row and column values:
+			</p>
+			<pre class="Math">var column = index % map.columns;
+var row = Math.floor( index / map.columns );</pre>
+			<p>
+				That's precisely how the example above calculates row and column from index in the output pane. If you plug the values you see in the output into these equations, you'll see that they work quite nicely. Remember that the map above has 16 columns in all.
+			</p>
+			<p>
+				There's still one more step to drawing graphics to the screen, and that's adjusting the row and column values to fit world space, which is measured in pixels. In the example, each tile is 16x16 pixels. If you want to calculate a tile's position from it's row and column in the map it's as simple as multiplying row and column by the tile's height and width respectively. And that's that.
+			</p>
+			<p>
+				As will be the trend throughout these tutorials, if you want a really in depth look at what makes the examples tick, I recommend you take a look at the source code, which is readily available on GitHub or in your browser's developer tools. You can also use the view source feature or I'm sure there are numerous other ways to get a hold of the source files. Such is the nature of JavaScript.
+			</p>
+			<br>
+			<a href="../index.html" id="center_link">Index</a>
+			<a href="../tutorial01/gameloop.html" id="right_link">Game Loop</a>
+		</div>
+
+		<!-- Footer. -->
+		<div id="footer">
+			<a href="">GitHub Repository</a>
+		</div>
+		<!-- The absolutely position output. -->
+		<p class="Output" id="output">
+			output
+		</p>
+
+		<!-- Script. -->
+		<script src="tilemap.js" type="text/javascript"></script>
+	</body>
+</html>

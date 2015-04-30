@@ -1,0 +1,28 @@
+/*******************************************/
+/* webworker.css. Frank Poth. 04/26/2015. */
+/*****************************************/
+/* Body. */
+body {
+	margin:0px;
+	padding:0px;
+}
+/* HTML. */
+html {
+	margin:0px;
+	padding:0px;
+}
+/* Display. */
+#display {
+	left:0px;
+	position:fixed;
+	top:0px;
+}
+/* Output. */
+#output {
+	color:#000000;
+	left:0px;
+	margin:0px;
+	padding:0px;
+	position:fixed;
+	top:0px;
+}
