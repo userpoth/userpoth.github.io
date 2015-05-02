@@ -14,7 +14,7 @@
 		<link href="../tilebasedgametutorials.css" rel="stylesheet" type="text/css">
 
 		<!-- Meta. -->
-		<meta content="HTML5 and JavaScript Game Loop example implementing fixed time step and interpolation using requestAnimationFrame. Unlock your mildest dreams with consistent gameplay!" name="description">
+		<meta content="Interactive example in HTML5 and JavaScript on how to draw a tile based map with full source code!" name="description">
 		<meta content="width=device-width" name="viewport">
 
 		<!-- Title. -->
@@ -63,18 +63,25 @@ var row = Math.floor( index / map.columns );</pre>
 				There's still one more step to drawing graphics to the screen, and that's adjusting the row and column values to fit world space, which is measured in pixels. In the example, each tile is 16x16 pixels. If you want to calculate a tile's position from it's row and column in the map it's as simple as multiplying row and column by the tile's height and width respectively. And that's that.
 			</p>
 			<p>
+				One other thing you should know is how to convert row and column values back into a single index. This is used to get an object's tile position in the map from its two dimensional coordinates which is pretty important. Say you want to work backwards from an object's physical x, y location in the map; here's how:
+			</p>
+			<pre class="Math">var column = Math.floor( object.x / map.columns );
+var row = Math.floor( object.y / map.rows );
+
+var index = row * map.columns + column;</pre>
+			<p>
 				As will be the trend throughout these tutorials, if you want a really in depth look at what makes the examples tick, I recommend you take a look at the source code, which is readily available on GitHub or in your browser's developer tools. You can also use the view source feature or I'm sure there are numerous other ways to get a hold of the source files. Such is the nature of JavaScript.
 			</p>
 			<br>
-			<a href="../index.html" id="center_link">Index</a>
+			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tilebasedgametutorials/tutorial00" id="center_link">Source</a>
 			<a href="../tutorial01/gameloop.html" id="right_link">Game Loop</a>
 		</div>
 
 		<!-- Footer. -->
 		<div id="footer">
-			<a href="">GitHub Repository</a>
+			<a href="../index.html">Index</a>
 		</div>
-		<!-- The absolutely position output. -->
+		<!-- The absolutely positioned output. -->
 		<p class="Output" id="output">
 			output
 		</p>

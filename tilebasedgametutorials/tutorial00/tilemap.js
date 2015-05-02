@@ -115,10 +115,7 @@
 				image_.removeEventListener("load", loadImage);
 
 				/* Call the callback. */
-				/* But first check if it exists (because in this case it doesn't exist)!!! */
-				if (callback_) {
-					callback_();
-				}
+				callback_();
 			}
 
 		}
@@ -163,8 +160,8 @@
 					draw();
 				}
 			},
-			/* VARIABLES. *
-			 /* The offset location of the display canvas used to calculated a relative position. */
+			/* VARIABLES. */
+			/* The offset location of the display canvas used to calculated a relative position. */
 			offset : new Point(0, 0),
 			/* The calculated position. */
 			position : new Point(0, 0),
