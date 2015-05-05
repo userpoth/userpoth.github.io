@@ -30,60 +30,53 @@
 
 		<!-- Content. -->
 		<div id="content">
-			<h2>Collision With Composite Tiles</h2>
+			<h2>Collision Detection And Response</h2>
 			<p>
-				Are you excited to read about tile collision? Well, don't answer until you try the example because you might not like what you see:
+				This example presents some simple collision detection and response in a tile based environment. It uses a lookup table of routing functions to connect the red square with the appropriate collision methods to resolve collision with the specific tiles he is touching. I realize that's not a very straight forward way to explain how things work, so I'll go into greater detail below. First check out the example, though. Click or double tap to jump and notice how the red square gets caught on adjacent solid tiles:
 			</p>
 			<canvas class="Canvas" id="display"></canvas>
 			<p>
-				Did you spot the glitch? I'm sure you did, it's not hard to spot. The red square gets caught on juxtaposed solid tiles. But hear me out now, because what you're seeing is expected behavior, I sabotaged the level. That's right. Sabotage. Let me explain:
+				I'll address the seeming glitch later on, but before I can do that, let me explain in more detail how the system works. Any tile based world is made up of rows and columns and ultimately individual tile spaces. You may not have realized it, but this is actually a naturally occurring spatial partitioning system that we can use to speed up collision detection a great deal by ruling out intensive broad phase collision detection methods. We don't need to check if the red square is colliding with ALL the tiles on screen because we can figure out exactly which one's he is colliding with just by calculating his row and column in the map to see which tiles are right under him.
 			</p>
 			<p>
-				This isn't a traditional approach to tile based collision. This approach has three steps and is highly modular in nature. The three steps are: detecting the tile values the red square is colliding with, sending the values and locations of the tile spaces in question to a collision function lookup table which identifies the unique collision tile the red square is colliding with, and finally resolving collision between the red square and the tile one side at a time.
+				Because tile maps are essentially a spatial partitioning system, it's super easy to look up which tiles the red square is interacting with at any time. To get the tile value under a specific point you can use this code:
 			</p>
-			<p>
-				That was hard to follow. Before I explain the glitch let me elaborate on the process a little more. Each corner of the red square is in a tile space. Say that the bottom left corner of the red square is in a tile space which is occupied by a platform tile. What should we do? Well, first we have to detect the collision:
-			</p>
-			<pre class="Math">/* First get the row and column of the bottom left corner of the object. */
-var bottom = Math.floor( ( object_.position.y + object_.height ) / tile_height );
-var left = Math.floor( object_.position.x / tile_width );
+			<pre class="Math">var column = Math.floor( object.x / tile_width );
+var row = Math.floor( object.y / tile_height );
 
-/* Then use those to get the value of the collision tile under that corner of the object in the map. */
-var value = map[ bottom * map.columns + left ];</pre>
+var value = tile_map[ row * map.number_of_columns + column ];</pre>
 			<p>
-				Okay, so, value now holds the tile value of the tile under the object's bottom left corner. Not only do you know the value, but you can easily convert the row and column values of bottom and left into physical coordinates for the tile, which is important for resolving collision. Now that you know the location and value of the tile you are colliding with, you're going to have to resolve the collision. To do this we pass the tile value to a collision lookup table and call the corresponding function, passing it the location values like so:
+				The value variable will give you the tile value of the tile at the row and column occupied by the object and you can use row and column to calculate the tile's physical position in the map. But how do we use this data to detect collision? Well, in effect, this is the broad phase collision method. All we know from the code above is that the object is colliding with a tile space that has a certain value. But that tile could be a slope tile, or a half tile or some other shape with empty space in it and although the object may be in the tile's personal space, it might not be touching the collision shape inside. All we have here is a super simple broad phase collision detection method with no resolution. But for 3 lines of code, that's some pretty sweet broad phase, right?
 			</p>
-			<pre class="Math">/* Get the function in the lookup table and call it, passing the object, left, and bottom as parameters. */
-lookup_table[ value ]( object_, left, bottom );</pre>
 			<p>
-				Inside the lookup table are functions labeled with numbers:
+				Now that you know the location and value of the tile space the object is occupying, you can move onto the next step, which I'm going to call routing. The routing part of this technique simply utilizes a lookup table stocked with a unique function for each type of collision shape. So, say the red square is on a tile with a value of 2. You just hand 2 to the lookup table and it gets the appropriate function to use. You could actually just put your collision code right into the functions in the lookup table, but I took it a step further. And here's why:
 			</p>
-			<pre class="Math">var lookup_table = {
-	// This particular function doesn't use tile_x_.
-	0 : function( object_, tile_x_, tile_y_ ){
-		// Calculate the physical top position of the tile for the second parameter.
-  		this.collideTop( object_, tile_y_ * tile_height );
-            }</pre>
 			<p>
-				For the sake of simplicity, let's say there's only one function in there labeled with 0. Now the lookup table finds the function that corresponds to the tile value (apparently 0) and calls it with the parameters you passed in. Finally that function calls yet another function, the collideTop function in this case, which looks like this:
+				Each tile has four sides, right? To be more specific, each tile space has four sides. For instance, a platform tile might have one actual collision surface on the shape itself, but an object can still approach it from the top, left, right or bottom or some combinations of those. I wanted a collision engine that could reuse collision functions between tiles instead of having one beastly chunk of code for a complex tile. For example, look at this code which depicts the routing function and the final collision functions for a solid tile:
 			</p>
-			<pre class="Math">collideTop : function( object_, top_ ){
-	if ( object_.position.y + object_.height > top_ && object_.last_position.y + object_.height <= top_ ){
-		object_.last_position.y = object_.position.y = top_ - object_.height;
-		object_.velocity.y = 0;
-	}
+			<pre class="Math">2: function( object_, row_, column_ ){
+	doTopCollision( object_, row_, column_ );
+	doBottomCollision( object_, row_, column_ );
+	doLeftCollision( object_, row_, column_ );
+	doRightCollision( object_, row_, column_ );
 }</pre>
 			<p>
-				Okay, so those are the three steps to performing collision detection and response using this technique. That will effectively place the red square on top of a platform tile.
+				The wrapper function is the routing function. In the scenario I gave before, the red square was in a tile space that had a value of 2, so the lookup table goes to function 2 with the object, row, and column parameters and then calls the specific collision functions needed to resolve collision between the red square and collision tile 2. A solid tile has four physical sides so we call four collision functions that handle narrow phase collision detection and response for each side.
 			</p>
 			<p>
-				Now, as for the reason the four sided tiles seem to glitch when they're next to each other, that is because they handle collision on more than one axis. When the red square moves along side them, he will collide with one on the y axis and the other on the x axis, causing him to halt vertically when falling along side vertically stacked solid tiles, and halting him horizontally along horizontally placed tiles. To combat this, you have to avoid placing solid tiles next to each other.
+				The benefit of this approach is that the collision engine itself is EXTREMELY modular. You can add completely new shapes just by adding a new function to the lookup table and use a combination of existing narrow phase collision functions to do the final resolution. And those functions can look like anything you want: slopes, curves, flat surfaces... Well, there's not a ton of options, but you could add other functions as well, like levers, spiky floor tiles, water, whatever. It's as easy as putting a new function inside the routing function. I guess you could put all the collision code right into the routing function, but then you'd be redefining functions like doTopCollision for every tile that has a flat surface on top. And that's fine if you want to tweak the code a little. You can pretty much do whatever you want because collision code for one tile isn't dependent at all on other tiles.
 			</p>
 			<p>
-				The benefit of this approach is that you can stuff the function in the lookup table with a unique function for each one of a tile's sides. Say you want to simulate two solid tiles next to each other horizontally. How do you avoid the hangup when your object moves between them? Instead of two four sided tiles you use two three sided tiles that open into each other, effectively forming a large rectangle. You will see what I mean in later examples, but for now I just wanted to show you some basic implementation. The reason for this is because of how huge the number of collision functions gets for this approach. For this example alone there are 5 functions for the individual tiles and 4 functions that perform the actual collision. The red tile has no function at all. If you were to somehow get into the red tile area on the map, you'd have a real error on your hands.
+				Now I can finally address those solid tiles and why they make the red square stick to them. If you looked at that routing function code, you'll notice that collision starts on the top side, goes to the bottom side, then left and right. This is because we want to separate our axes. If you've researched the topic elsewhere you might have seen the phrase "y-first check" or "y-first collision detection". You want to do collision on the y axis first if your objects mostly move over the tops of tiles, and they usually do. You jump up and fall down in most games. Collisions with the left and right sides of tiles aren't nearly as common as top and bottom collisions. With that in mind, consider what happens when your object is sitting on top of two adjacent tiles. The first tile will push him up out of the collision, resolving collision on the y axis. The second tile will now no longer have the option to push him up because the other tile pushed him out of y range. This leaves only two options: resolve collision on the x axis or do nothing if no collision exists. This functionality causes the object to get stuck between adjacent square tiles.
 			</p>
 			<p>
-				Why would you want all those functions, though: one for each tile? I guess it's up to personal preference, but with this approach you can easily mix and match functions to create unique collision objects. Slopes in particular benefit from this approach. You can make some pretty sweet stuff that conventional methods don't accommodate. So check out the next example! And definitely look at the source code.
+				The behavior is even more prevalent when falling down the side of a wall of solid tiles because the first collision check happens on the y axis. The tiles don't know they're part of a wall, they just know how to resolve collision as if they were a solitary tile. If an object passes through the top side of one of the tiles, collision will be checked on the y axis first and likely return a valid collision if the object is moving up or down through the top or bottom of the tile. This causes the object to get stuck on the tile's top or bottom edge rather than sliding along the left or right side smoothly.
+			</p>
+			<p>
+				But never fear! There's an easy way to overcome this annoying behavior. All you have to do is not place tiles with conflicting edges next to one another. You can achieve all the tile shapes you need by mixing and matching edges and the result is super smooth collision. Of course you would never want to use this method for a level comprised of only solid, four sided tiles because you need 15 different combinations to simulate one solid tile this way. But the benefits of this approach for adding in slope tiles and other odd shaped tiles are well worth the tedium of coding the extra 14 tile types.
+			</p>
+			<p>
+				And that's it for this tutorial. Be sure to take a look at the source code and the next example, which covers slope tiles.
 			</p>
 			<br>
 			<a href="../tutorial01/gameloop.html" id="left_link">Game Loop</a>

@@ -366,8 +366,7 @@
 				/* The only thing to worry about is if the previous collision detection was handled by the collider. */
 				/* If it was, the object will have been moved which means that the side values we're using are no longer accurate. */
 				/* We'll have to redefine them to gain accuracy. */
-
-				//bottom = Math.floor(object_.getMaximumY() / tile_sheet.tile_height);
+				bottom = Math.floor(object_.getMaximumY() / tile_sheet.tile_height);
 				var right = Math.floor(object_.getMaximumX() / tile_sheet.tile_width);
 				/* Check the bottom right tile. */
 				value = this.tiles[bottom * this.columns + right];
@@ -375,7 +374,7 @@
 					collider[value](object_, bottom, right);
 				}
 
-				//left = Math.floor(object_.position.x / tile_sheet.tile_width);
+				left = Math.floor(object_.position.x / tile_sheet.tile_width);
 				var top = Math.floor(object_.position.y / tile_sheet.tile_height);
 
 				/* Check the top left tile. */
@@ -384,8 +383,8 @@
 					collider[value](object_, top, left);
 				}
 
-				//right = Math.floor(object_.getMaximumX() / tile_sheet.tile_width);
-				//top = Math.floor(object_.position.y / tile_sheet.tile_height);
+				right = Math.floor(object_.getMaximumX() / tile_sheet.tile_width);
+				top = Math.floor(object_.position.y / tile_sheet.tile_height);
 
 				/* Check the top right tile. */
 				value = this.tiles[top * this.columns + right];
@@ -398,7 +397,7 @@
 			/* Here's a new variable for you! It's gravity. It's what I'm gonna use to make the red square fall. */
 			gravity : 1,
 			length : 256,
-			tiles : [0, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 2, 999, 999, 999, 0, 0, 0, 0, 999, 999, 999, 999, 999, 999, 999, 4, 2, 5, 5, 999, 999, 4, 6, 2, 999, 999, 0, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 4, 6, 2, 999, 999, 999, 999, 0, 999, 999, 4, 2, 999, 5, 999, 999, 4, 6, 2, 999, 5, 5, 5, 5, 5, 999, 4, 2, 999, 999, 999, 999, 4, 6, 2, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 4, 6, 2, 999, 5, 999, 999, 999, 1, 999, 4, 2, 999, 999, 999, 999, 0, 0, 0, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 0, 0, 999, 999, 5, 999, 999, 999, 1, 999, 4, 2, 999, 999, 999, 999, 0, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 0, 999, 999, 999, 5, 999, 999, 999, 1, 999, 4, 2, 999, 999, 999, 999, 0, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 0, 999, 5, 0, 0, 0, 5, 999, 1, 999, 4, 2, 999, 999, 999, 999, 0, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 5, 999, 999, 999, 5, 999, 0, 999, 4, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+			tiles : [999, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 999, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 5, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 5, 5, 5, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 0, 0, 0, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 0, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 0, 999, 999, 0, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 0, 999, 999, 5, 999, 999, 999, 4, 999, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 999]
 		};
 
 		/* Once again we meet red_square. He's the butt kickin', soul eating, baby kissing protagonist of this tutorial series (at least until we get animated). */
