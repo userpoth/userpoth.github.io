@@ -2,27 +2,18 @@
 /* collision.js. Frank Poth. 05/01/2015. */
 //////////////////////////////////////////
 
-/* Glean from this source code the methods by which to perform collision detection and response with tile maps!!! */
-/* All this example does is draw a tile map, give the user control of a red square, and stop that square from going into walls. */
-/* Hot dog. Sounds like a hoot, eh? */
+/* Alright, so this is pretty much exactly like the last example. The only difference is that I'm adding some slope collision functions to the mix. */
+/* What's awesome about this type of collision engine is you can add or remove as many different functions as you want and everything else can remain the same. */
+/* Each collision tile type is completely separate from the rest and adding new types is as easy as making a new function in the collider object. */
 
-/* Anyway, the approach I use is a little bit different to accomodate the addition of slope tiles and other custom shaped tiles. */
-/* I use a lookup table of collision functions that take a tile value input; basically an input table. */
-/* With this approach I can have many unique collision functions for each tile that are comprised of a few base functions and I can actually have more collision shapes than a regular tile game with less code volume. */
-/* Also, lookup tables are pretty snappy and keep lookups in pretty much constant time (as opposed to if else blocks and switch statements). */
+/* What you want to check out is the collider object, that's where the slope collision code is. */
 
-/* It might seem like overkill in this example, but it will be worth it when you want to easily add more collision shapes to your game. */
-/* And those other tutorials that tell you you can't have certain arrangements of tiles? Well, they are not very ambitious. If you can think it, you can code it, and this approach accommodates that viewpoint. */
-
-/* STUFF TO LOOK AT: the collider object, which handles collision response, and the detectCollision function in the map object, which detects collision. Huh, who would've guessed? */
 (
 	function collision() {
 		///////////////
 		/* CLASSES. */
 		/////////////
 
-		/* Kicking things up a notch with some of the same exact CUSTOM JAVASCRIPT CLASSES I used in the last example. */
-		/* Like good ol' Point, here. I never get tired of using Points. */
 		function Point(x_, y_) {
 			this.x = x_;
 			this.y = y_;
@@ -34,9 +25,7 @@
 			this.y = y_;
 		}
 
-		/* By defining things on the object prototype you only end up with one set of definitions. */
-		/* If you define stuff in the actual constructor, each instance of the class will have its own unique property or function. */
-		/* You wouldn't want to define scale in the constructor because it would create a new scale function for every new Vector object even though it would do the exact same thing for all of them. */
+
 		Vector.prototype = {
 			/* FUNCTIONS. */
 			/* I'm gonna use this AWESOME function to apply "friction" (fake friction) to the red square's velocity vector. */
@@ -147,15 +136,8 @@
 		/* He is the man. */
 		var collider = {
 			/* FUNCTIONS. */
-			/* Okay, so here we have all the unique collision methods. */
-			/* Every function with a plain number name represents the collision methods used for colliding with a unique tile. */
-			/* Each number represents the value of the collision tile in the collison tile map. */
-
 			/* Collide with a four sided tile. */
 			0 : function(object_, tile_x_, tile_y_) {
-				/* This is an interesting case because the full square tile is the only one in this example with multiple sides. */
-				/* I'm going to call it a composite tile because it is composed of four different tests. */
-				/* This is how you can achieve multi sided shapes and many variations of collision types for a more interesting level. */
 				if (this.collideFlatTop(object_, tile_y_ * tile_sheet.tile_height)) {
 					return;
 				}
@@ -183,17 +165,54 @@
 			4 : function(object_, tile_x_, tile_y_) {
 				this.collideFlatLeft(object_, tile_x_ * tile_sheet.tile_width);
 			},
-			/* Flat top sided platform, notice the half height. */
+			/* HERE'S SOME NEW CODE!!! */
+			/* I took out the half height platform and added some slope functions!. */
+			/* Half height half negative slope. */
 			5 : function(object_, tile_x_, tile_y_) {
-				this.collideFlatTop(object_, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_half_height);
+				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_height, -0.5);
 			},
-
-			/* These functions with actual names are used inside of the tile specific functions. */
-			/* For instance, if you want to collide an object with a regular square tile with four sides, you could have one lengthy and very unique function, or you could use four functions: one for each side. */
-			/* In my opinion, it's better to have one function for each "type" of collison because you might have a couple different tiles that use the collideFlatTop method. */
-			/* While it's not so evident in this example, it will make much more sense when slope tiles enter the picture. */
-			/* Also note that these are platforms. */
-			/* Collide with the bottom side of a tile. */
+			/* This is a half height half negative slope in the top part of the tile space. */
+			/* It's a lot easier to just look at the tiles in the tile sheet and compare them to these functions. They go in order. */
+			/* Anyway, see how easy it is to get new tile objects with this approach? It does something different, but we're using the same base collision function. */
+			/* Each slope tile uses the same base function, just a little differently. */
+			/* The only downside is a cluttered collider object, but you can't expect things to work without code, so it's necessary clutter! */
+			6 : function(object_, tile_x_, tile_y_) {
+				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_half_height, -0.5);
+			},
+			7 : function(object_, tile_x_, tile_y_) {
+				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_height, -1);
+			},
+			8 : function(object_, tile_x_, tile_y_) {
+				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height, 1);
+			},
+			9 : function(object_, tile_x_, tile_y_) {
+				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height, 0.5);
+			},
+			10 : function(object_, tile_x_, tile_y_) {
+				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_half_height, 0.5);
+			},
+			/* OKAY!!! This is the exciting one! It's a solid, stand alone slope tile. */
+			/* That's right, flat collision on the right and bottom, sloped collision on the top and right. */
+			/* Let's do this to this. */
+			11 : function(object_, tile_x_, tile_y_) {
+				/* So, notice that I subtracted the object's width from the right side of the tile. */
+				/* This is because I wanted my slope to only support the red square when his mid point is over the tile. */
+				/* We have to move the right wall back in order to accomodate this and still have some collision with the right side. */
+				/* Also notice that this is doing x first collision checking. */
+				/* Because most of the time you will be moving into a slope from the side, it's best to do x checks first. */
+				/* Most slope scenario's don't require that the tile have collision on all four sides. */
+				if (this.collideFlatRight(object_, tile_x_ * tile_sheet.tile_width + tile_sheet.tile_width - object_.width * 0.5)) {
+					return;
+				}
+				if (this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_height, -1)) {
+					return;
+				}
+				if (this.collideSegmentBottom(object_, tile_x_ * tile_sheet.tile_width, tile_x_ * tile_sheet.tile_width + tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_height)) {
+					return;
+				}
+				/* I didn't put any code for left collision in here, but basically you'd just want to cover the case when the object has a y velocity of 0 and an x velocity of > 0. */
+				/* Otherwise the player won't be able to climb the slope. */
+			},
 			collideFlatBottom : function(object_, bottom_) {
 				if (object_.position.y < bottom_ && object_.last_position.y >= bottom_) {
 					object_.last_position.y = object_.position.y = bottom_;
@@ -202,7 +221,6 @@
 				}
 				return false;
 			},
-			/* Collide with the left side of a tile. */
 			collideFlatLeft : function(object_, left_) {
 				if (object_.getMaximumX() > left_ && object_.last_position.x + object_.width <= left_) {
 					object_.last_position.x = object_.position.x = left_ - object_.width;
@@ -211,7 +229,6 @@
 				}
 				return false;
 			},
-			/* Collide with the right side of a tile. */
 			collideFlatRight : function(object_, right_) {
 				if (object_.position.x < right_ && object_.last_position.x >= right_) {
 					object_.last_position.x = object_.position.x = right_;
@@ -220,9 +237,7 @@
 				}
 				return false;
 			},
-			/* Collide with the top side of a tile. */
 			collideFlatTop : function(object_, top_) {
-				/* You can only collide with the top of the tile while you are moving down into it and your bottom is below its top. */
 				if (object_.getMaximumY() > top_ && object_.last_position.y + object_.height <= top_) {
 					object_.airborne = false;
 					object_.last_position.y = object_.position.y = top_ - object_.height;
@@ -230,12 +245,36 @@
 					return true;
 				}
 				return false;
-			}
+			},
+			/* Some extra code for the bottom of a stand alone slope tile. */
+			/* Basically says that you can only collide when the object's mid x point is between left and right. */
+			collideSegmentBottom : function(object_, left_, right_, bottom_) {
+				if (object_.getMeanX() >= left_ && object_.getMeanX() <= right_ && object_.position.y < bottom_ && object_.last_position.y >= bottom_) {
+					object_.last_position.y = object_.position.y = bottom_;
+					object_.velocity.y = 0;
+					return true;
+				}
+				return false;
+
+			},
+			/* Since all of our slopes in this example are facing up, we only need one new collision function! */
+			/* Start x and start y are simply where the slope starts from. So if your slope starts in the bottom left corner of the tile space, those are the locations you want to give this function. */
+			/* slope_ is literally the slope of the tile. Remember that JavaScript uses an inverted y axis, so a slope like this: / will have a negative slope. Just remember that y = mx+b. Algebra. Bam. */
+			collideSlopeTop : function(object_, start_x_, start_y_, slope_) {
+				/* Remember y = mx + b? Well, b = y - mx. */
+				var y_intercept = start_y_ - slope_ * start_x_;
+				/* Guess what this is! It's y = mx + b! */
+				var top = slope_ * object_.getMeanX() + y_intercept;
+				if (object_.velocity.y >= 0 && object_.getMeanX() >= start_x_ && object_.getMeanX() <= start_x_ + tile_sheet.tile_width && object_.getMaximumY() > top) {
+					object_.airborne = false;
+					object_.last_position.y = object_.position.y = top - object_.height;
+					object_.velocity.y = 0;
+					return true;
+				}
+				return false;
+			},
 		};
 
-		/* The controller object helps to control the red square on mobile and desktop devices. */
-		/* Like most of the object literals in this code, I've already explained what they do in the tile map tutorial. */
-		/* I'm leaving out repeat comments because it's clutter, and this stuff isn't really the focus of the tutorial anyway. */
 		var controller = {
 			/* FUNCTIONS. */
 			doAction : function() {
@@ -315,13 +354,8 @@
 		};
 
 		/* The map object. */
-		/* Now, normally, collision maps and graphics maps are kept in two separate arrays when using complex collision tiles, but for the sake of visualizing the collision objects, I made the graphics match the shape of the collision object. */
-		/* Basically, instead of the graphics looking like pretty graphics, they look like what I think is a good representation of the type of collision they do. */
-		/* As a result, instead of two maps, I just have one map. */
-		/* But remember: multiple layers. There's a graphics layer, a collision layer, a background graphics layer, a foreground graphics layer. Just a lot of layers depending on your game. For this example: just one layer. */
 		var map = {
 			/* FUNCTIONS. */
-			/* I condensed the draw function a little bit. If you want to see the expanded version, look at the tile map tutorial. */
 			draw : function() {
 				for (var index = this.length - 1; index > -1; index--) {
 					var value = this.tiles[index];
@@ -329,46 +363,23 @@
 					if (value != 999) {
 						var destination_x = (index % this.columns) * tile_sheet.tile_width;
 						var destination_y = Math.floor(index / this.columns) * tile_sheet.tile_height;
-						/* For this particular example, my tile sheet only has one row. This means I can tweak the way I get the source image for the tile I'm drawing a little bit. */
 						var source_x = value * tile_sheet.tile_width;
-						/* See how simple that is? But I don't recommend having tile sheets that just have one really long row. I guess it still works. Eh, actually, I guess there's no reason not to. I guess it's a matter of preference, really. */
-						/* Since there's only one row, the source_y value is always 0. */
 
 						buffer.drawImage(source_image, source_x, 0, tile_sheet.tile_width, tile_sheet.tile_height, destination_x, destination_y, tile_sheet.tile_width, tile_sheet.tile_height);
 					}
 				}
 			},
-			/* This super fly chicken is responsible for detecting which tiles the red square is colliding with and calling collision functions from the collider object. */
 			detectCollision : function(object_) {
-				/* This is part one of the collision process: detecting which tiles an object is overlapping. */
-				/* It's pretty simple. All you do is check each corner of the object's bounding rectangle (or the hit box). */
-				/* Since red square is, well, a square, this is particularly easy to do. */
-				/* Here's how to get the sides. After all, it takes two sides to make a corner. */
-
 				var bottom = Math.floor(object_.getMaximumY() / tile_sheet.tile_height);
 				var left = Math.floor(object_.position.x / tile_sheet.tile_width);
 
-				/* All those values are are row and column positions in the map. If you read the tile map tutorial, or maybe you just already know this, you know that you can use rows and columns to get values at specific indices in the tile map. */
-				/* Now that we have the row and column positions occupied by the object, we can get the tile values to collide with and handle collision using the collider object. */
-				/* The red square has 4 corners, so we check each one of them. */
-				/* OH, YEAH, one thing to be cautious of is making your object larger than 2 tile sizes. If he's too big, this detection method will have to be expanded to get all the tiles he overlaps, not just the ones under his corners. */
-
-				/* Value is the tile value under the object_'s corner. */
-				/* It's easy to figure out: this is checking the tile value under the bottom row and left column of the object in tile space. */
 				var value = this.tiles[bottom * this.columns + left];
 				if (value != 999) {
-					/* The collider object is just a lookup table. */
-					/* It's full of functions you can reference with just a number value, so we can pass in the value of our tile to access the corresponding collision function. */
-					/* We also pass in the physical coordinates of the tile space the object is colliding with as the last two parameters. */
 					collider[value](object_, left, bottom);
 				}
-				/* Then we repeat the process for the other three corners. */
-				/* The only thing to worry about is if the previous collision detection was handled by the collider. */
-				/* If it was, the object will have been moved which means that the side values we're using are no longer accurate. */
-				/* We'll have to redefine them to gain accuracy. */
 				bottom = Math.floor(object_.getMaximumY() / tile_sheet.tile_height);
 				var right = Math.floor(object_.getMaximumX() / tile_sheet.tile_width);
-				/* Check the bottom right tile. */
+
 				value = this.tiles[bottom * this.columns + right];
 				if (value != 999) {
 					collider[value](object_, right, bottom);
@@ -377,7 +388,6 @@
 				left = Math.floor(object_.position.x / tile_sheet.tile_width);
 				var top = Math.floor(object_.position.y / tile_sheet.tile_height);
 
-				/* Check the top left tile. */
 				value = this.tiles[top * this.columns + left];
 				if (value != 999) {
 					collider[value](object_, left, top);
@@ -386,7 +396,6 @@
 				right = Math.floor(object_.getMaximumX() / tile_sheet.tile_width);
 				top = Math.floor(object_.position.y / tile_sheet.tile_height);
 
-				/* Check the top right tile. */
 				value = this.tiles[top * this.columns + right];
 				if (value != 999) {
 					collider[value](object_, right, top);
@@ -394,30 +403,32 @@
 			},
 			/* VARIABLES. */
 			columns : 16,
-			/* Here's a new variable for you! It's gravity. It's what I'm gonna use to make the red square fall. */
 			gravity : 1,
 			length : 256,
-			tiles : [999, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 999, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 5, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 5, 5, 5, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 0, 0, 0, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 999, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 0, 999, 999, 5, 999, 999, 999, 4, 2, 999, 999, 999, 999, 0, 999, 999, 0, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 999, 999, 999, 999, 999, 0, 999, 999, 5, 999, 999, 999, 4, 999, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 999]
+			tiles : [999, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 999, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 1, 1, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 11, 999, 999, 11, 999, 999, 11, 999, 999, 4, 2, 999, 1, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 1, 1, 1, 1, 1, 1, 1, 1, 1, 999, 4, 2, 999, 1, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 1, 999, 4, 2, 999, 1, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 1, 999, 4, 2, 999, 1, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 1, 999, 4, 2, 999, 1, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 4, 2, 999, 5, 6, 9, 10, 999, 5, 10, 999, 7, 8, 999, 1, 7, 999, 999, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 999, 999]
 		};
 
-		/* Once again we meet red_square. He's the butt kickin', soul eating, baby kissing protagonist of this tutorial series (at least until we get animated). */
-		/* Also, the game loop tutorial explains interpolation to some extent. */
 		var red_square = {
 			/* FUNCTIONS. */
 			draw : function(time_step_) {
 				var interpolated_x = this.last_position.x + (this.position.x - this.last_position.x) * time_step_;
 				var interpolated_y = this.last_position.y + (this.position.y - this.last_position.y) * time_step_;
 
-				buffer.drawImage(source_image, 96, 0, 16, 16, interpolated_x, interpolated_y, this.width, this.height);
+				buffer.drawImage(source_image, 192, 0, 16, 16, interpolated_x, interpolated_y, this.width, this.height);
 			},
-			/* These functions are for getting the farthest x and y coordinate on the player. */
-			/* YOU CAN SEE THEM IN THE COLLISION CODE BECAUSE THAT'S WHAT THEY'RE USED FOR!!!!!!!!!!! */
-			/* Don't be afraid of how complicated they are... */
 			getMaximumX : function() {
 				return this.position.x + this.width;
 			},
 			getMaximumY : function() {
 				return this.position.y + this.height;
+			},
+			/* Some new functionality for the red square! */
+			/* Get the middle point on each axis! */
+			getMeanX : function() {
+				return this.position.x + this.width * 0.5;
+			},
+			getMeanY : function() {
+				return this.position.y + this.height * 0.5;
 			},
 			update : function() {
 				this.last_position.x = this.position.x;
@@ -435,14 +446,12 @@
 
 				this.velocity.y += map.gravity;
 
-				/* Making use of that new Vector function to apply some friction. */
 				this.velocity.scale(0.9);
 
 				this.position.x += this.velocity.x;
 				this.position.y += this.velocity.y;
 			},
 			/* VARIABLES. */
-			/* Whether or not the red square is in the air. */
 			airborne : true,
 			height : 14,
 			last_position : new Point(16, 16),
@@ -451,11 +460,8 @@
 			width : 14
 		};
 
-		/* The tile sheet object just defines dimensions of the source image for this example. */
-		/* See the tile map tutorial for more info. */
 		var tile_sheet = {
 			columns : 7,
-			/* This is used for the platform. It's only half as high as a normal tile top. */
 			tile_half_height : 8,
 			tile_height : 16,
 			tile_width : 16
@@ -477,11 +483,10 @@
 		buffer.canvas.height = buffer.canvas.width = 256;
 
 		/* Load up the source image! */
-		startLoadImage(source_image, "collision.png", function() {
+		startLoadImage(source_image, "slopes.png", function() {
 			window.addEventListener("resize", resizeWindow);
 
 			if ("ontouchstart" in document.documentElement) {
-				/* If the user is using a touch device, two listeners will be needed, because touch move events aren't as responsive as mousemove events. */
 				html.display.addEventListener("touchmove", touchMoveDisplay);
 				html.display.addEventListener("touchstart", touchStartDisplay);
 			} else {

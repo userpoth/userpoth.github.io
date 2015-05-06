@@ -76,12 +76,30 @@ var value = tile_map[ row * map.number_of_columns + column ];</pre>
 				But never fear! There's an easy way to overcome this annoying behavior. All you have to do is not place tiles with conflicting edges next to one another. You can achieve all the tile shapes you need by mixing and matching edges and the result is super smooth collision. Of course you would never want to use this method for a level comprised of only solid, four sided tiles because you need 15 different combinations to simulate one solid tile this way. But the benefits of this approach for adding in slope tiles and other odd shaped tiles are well worth the tedium of coding the extra 14 tile types.
 			</p>
 			<p>
-				And that's it for this tutorial. Be sure to take a look at the source code and the next example, which covers slope tiles.
+				There's one last thing to cover and that's the collision code itself. This is ridiculously simple when you do it one side at a time. So, imagine that your object is falling down and you want to keep him from falling off the bottom of the screen. How do you stop him from disappearing into the unknown? Simple:
+			</p>
+			<pre class="Math">/* Assuming 256 is the bottom boundary of the screen. */
+if ( object.y + object.height > 256 ) {
+	object.y = 256 - object.height;
+	object.velocity.y = 0;
+}</pre>
+			<p>
+				Well, that's pretty much as simple as it gets, but how does it translate to tiles? Pretty much like this:
+
+			</p>
+			<pre class="Math">function collideWithTopOfTile( object_, top_ ){
+	if ( object_.velocity.y > 0 && object_.y + object_.height > top_ ){
+		object_.y = top_ - object_.height;
+		object_.velocity.y = 0;
+	}
+}</pre>
+			<p>
+				The value of top_ will have to be calculated in the routing function of course, but it's that simple. The other sides are basically just variations of that extremely straight forward function. And that's it for this tutorial! Be sure to take a look at the source code and the next example, which covers slope tiles.
 			</p>
 			<br>
 			<a href="../tutorial01/gameloop.html" id="left_link">Game Loop</a>
 			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tilebasedgametutorials/tutorial02" id="center_link">Source</a>
-			<a href="" id="right_link">#</a>
+			<a href="../tutorial03/slopes.html" id="right_link">Slopes</a>
 		</div>
 
 		<!-- Footer. -->
