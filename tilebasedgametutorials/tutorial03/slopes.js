@@ -1,6 +1,6 @@
-////////////////////////////////////////////
-/* collision.js. Frank Poth. 05/01/2015. */
-//////////////////////////////////////////
+/////////////////////////////////////////
+/* slopes.js. Frank Poth. 05/01/2015. */
+///////////////////////////////////////
 
 /* Alright, so this is pretty much exactly like the last example. The only difference is that I'm adding some slope collision functions to the mix. */
 /* What's awesome about this type of collision engine is you can add or remove as many different functions as you want and everything else can remain the same. */
@@ -9,7 +9,7 @@
 /* What you want to check out is the collider object, that's where the slope collision code is. */
 
 (
-	function collision() {
+	function slopes() {
 		///////////////
 		/* CLASSES. */
 		/////////////
@@ -192,7 +192,7 @@
 				this.collideSlopeTop(object_, tile_x_ * tile_sheet.tile_width, tile_y_ * tile_sheet.tile_height + tile_sheet.tile_half_height, 0.5);
 			},
 			/* OKAY!!! This is the exciting one! It's a solid, stand alone slope tile. */
-			/* That's right, flat collision on the right and bottom, sloped collision on the top and right. */
+			/* That's right, flat collision on the right and bottom, sloped collision on the top and left. */
 			/* Let's do this to this. */
 			11 : function(object_, tile_x_, tile_y_) {
 				/* So, notice that I subtracted the object's width from the right side of the tile. */
