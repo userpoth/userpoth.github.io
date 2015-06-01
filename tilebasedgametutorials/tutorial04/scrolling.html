@@ -30,11 +30,73 @@
 		<!-- Content. -->
 		<div id="content">
 			<h2>Scrolling Level</h2>
+			<p>
+				Here we are at the scrolling world example. This is a 32x32 tile map and can be navigated with the arrow keys or touch buttons depending on your device.
+			</p>
 			<canvas class="Canvas" id="display"></canvas>
+			<p>
+				The scrolling itself is extremely straight forward. In fact, the approach is probably even simpler to understand than drawing tiles in the previous examples. But first we have to determine the boundaries of our visible region. Here's a bit of source code:
+			</p>
+			<pre class="Math">var first_column = Math.floor((-map.offset.x + 8) / tile_sheet.tile_width);
+				
+if (first_column < 0) {
+	first_column = 0;
+}
+
+var last_column = first_column + map.visible_columns;
+			
+if (last_column > map.columns) {
+	last_column = map.columns;
+}
+
+var first_row = Math.floor((-map.offset.y + 8) / tile_sheet.tile_height);
+
+if (first_row < 0) {
+	first_row = 0;
+}
+
+var last_row = first_row + map.visible_rows;
+			
+if (last_row > map.rows) {
+	last_row = map.rows;
+}</pre>
+			<p>
+				So, what all of that does is set up the boundaries of the area of the map we want to draw. The first and last columns are the horizontal boundaries of the area we want to draw and the first and last rows are the vertical boundaries. Depending on the offset, these values could be 0, which is the very first row or column or the maximum value which is stored in map.columns or map.rows or anything in between. A good way to visualize this is to picture a rectangle on a large grid. You only want to draw tiles inside the rectangle so you get its boundaries by looking at the columns and rows its edges come into contact with. One thing to note is the 8 I added in to the equations for first row and column. This is used to ensure that tiles are culled neatly around every edge of the screen rather than only on the top and left or right and bottom. 8 just happens to be half of 16, which is the tile width and height for this example.
+			</p>
+			<p>
+				Now that we have the row and column boundaries of our map region, we just have to loop through and draw the tiles. I use a two dimensional approach here because it fits so naturally with the variables defined above. The code looks like this:
+			</p>
+			<pre class="Math">for (var column = first_column; column < last_column; column++) {
+	for (var row = first_row; row < last_row; row++) {
+		var value = this.tiles[row * this.columns + column];
+
+		if (value != 999) {
+			var destination_x = this.offset.x + column * tile_sheet.tile_width;
+			var destination_y = this.offset.y + row * tile_sheet.tile_height;
+			var source_x = value * tile_sheet.tile_width;
+
+			buffer.drawImage(source_image, source_x, 0, tile_sheet.tile_width, tile_sheet.tile_height, destination_x, destination_y, tile_sheet.tile_width, tile_sheet.tile_height);
+		}
+	}
+}</pre>
+			<p>
+				So, you should be able to see what's going on pretty clearly. The algorithm just loops through every row for each column in the region we want to draw, gets the tile value at each specific index, and draws it if it's not an empty tile. The reason there's a 0 where the source_y variable should be is because the graphics sheet I used for this example only has one row of tiles in it.
+			</p>
+			<p>
+				The only other aspect of scrolling the map is the actual offset position, which is determined by the player character's position and the center of the game's viewport. This code is very simple:
+			</p>
+			<pre class="Math">map.offset.x += (128 - red_square.position.x - map.offset.x) * 0.1;
+map.offset.y += (128 - red_square.position.y - map.offset.y) * 0.1;</pre>
+			<p>
+				128 is the center of the visible map, because our game viewport is 256x256 pixels. The 0.1 is the multiplier by which to tone down the scroll speed. And it's as simple as that. Check out the source code for the example to see it all in action.
+			</p>
+			<p>
+				One thing I'd like to mention in addition is that I was unsure of how to approach controls for this example, because the control scheme I use in the previous examples is no longer viable in a scrolling environment. The mouse or touch position is static on the screen and every time the game scrolls it moves the virtual position of the red square away from the target of the static destination. To remedy this I switched to keyboard and button input, but it definitely added a lot of new code to this example. If you would like to examine it in its own context, I wrote another example which can be found in the next tutorial referenced in the link below.
+			</p>
 			<br>
 			<a href="../tutorial03/slopes.html" id="left_link">Slopes</a>
 			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tilebasedgametutorials/tutorial04" id="center_link">Source</a>
-			<a href="" id="right_link">#</a>
+			<a href="../tutorial04b/control.html" id="right_link">Control</a>
 		</div>
 
 		<!-- Footer. -->

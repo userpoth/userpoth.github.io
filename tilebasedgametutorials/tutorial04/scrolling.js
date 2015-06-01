@@ -8,11 +8,73 @@
 /* What you'll want to check out is the new update function in the map object. */
 /* Also the draw function in the map object. */
 
+/* Also, I'm modifying the user control scheme. */
+/* Instead of mouse and touch, I'm using keyboard for desktop, and buttons for mobile. The controller object will mostly stay the same, but there will be a few new basic listener functions for keyboard support. */
+
 (
 	function scrolling() {
 		///////////////
 		/* CLASSES. */
 		/////////////
+
+		/* This is the ultra fine new button class. */
+		function Button(x_, y_, width_, height_, frame_down_, frame_up_, handleDown_, handleUp_) {
+			this.height = height_;
+			this.handleDown = handleDown_;
+			this.handleUp = handleUp_;
+			this.frame = frame_up_;
+			this.frame_down = frame_down_;
+			this.frame_up = frame_up_;
+			this.pressed = false;
+			this.width = width_;
+			this.x = x_;
+			this.y = y_;
+		}
+
+
+		Button.prototype = {
+			/* FUNCTIONS. */
+			/* Tests to see if the specified coordinates are inside the rectangle or not. */
+			containsCoordinates : function(x_, y_) {
+				/* Pretty simple stuff. Return false if the parameter coordinates are anywhere outside of the rectangle. */
+				if (x_ < this.x || y_ < this.y || x_ > this.getMaximumX() || y_ > this.getMaximumY()) {
+					return false;
+				}
+				/* If the parameter coordinates aren't outside of the rectangle, they must be inside. */
+				return true;
+			},
+			/* Draws the button to the buffer. */
+			draw : function() {
+				var source_x = this.frame * tile_sheet.tile_width;
+				var source_y = 0;
+				buffer.drawImage(source_image, source_x, source_y, tile_sheet.tile_width, tile_sheet.tile_height, this.x, this.y, this.width, this.height);
+			},
+			/* Returns the left boundary of the rectangle. */
+			getMaximumX : function() {
+				return this.x + this.width;
+			},
+			/* Returns the bottom boundary of the rectangle. */
+			getMaximumY : function() {
+				return this.y + this.height;
+			},
+			/* So, this should be self explanatory. */
+			press : function() {
+				/* You cannot press what is already pressed. If you could, it'd be impressive, however. */
+				if (this.pressed == false) {
+					this.frame = this.frame_down;
+					this.pressed = true;
+					this.handleDown();
+				}
+			},
+			/* Unpress the button. */
+			unpress : function() {
+				if (this.pressed == true) {
+					this.frame = this.frame_up;
+					this.pressed = false;
+					this.handleUp();
+				}
+			},
+		};
 
 		function Point(x_, y_) {
 			this.x = x_;
@@ -39,17 +101,36 @@
 		/* FUNCTIONS. */
 		///////////////
 
-		function mouseDownDisplay(event_) {
+		/* This is for desktop control. */
+		/* These two functions store key up or down values in the keys object, which can be found in the OBJECT LITERALS section. */
+		function keyDownWindow(event_) {
 			event_.preventDefault();
-			controller.doAction();
-			/* I added this to the mouse controls to make things go more smoothly. */
-			/* Because the world scrolls constantly and the controller position only updates when this function is called, there can be some weird behavior. */
-			controller.moveTo(event_.pageX, event_.pageY);
+
+			switch(event_.keyCode) {
+				case 37:
+					controller.keys.left = true;
+					break;
+				case 38:
+					controller.keys.up = true;
+					break;
+				case 39:
+					controller.keys.right = true;
+			}
 		}
 
-		function mouseMoveDisplay(event_) {
+		function keyUpWindow(event_) {
 			event_.preventDefault();
-			controller.moveTo(event_.pageX, event_.pageY);
+
+			switch(event_.keyCode) {
+				case 37:
+					controller.keys.left = false;
+					break;
+				case 38:
+					controller.keys.up = false;
+					break;
+				case 39:
+					controller.keys.right = false;
+			}
 		}
 
 		/* Ah - ah! You know what it is! Resize when your window get's too biiig. */
@@ -65,14 +146,14 @@
 				html.display.style.left = "0px";
 			}
 
-			controller.size_ratio = buffer.canvas.width / html.display.width;
+			display_size_ratio = buffer.canvas.width / display.canvas.width;
 
-			var element = html.display;
-			controller.offset.x = controller.offset.y = 0;
+			var element = display.canvas;
+			display_offset.x = display_offset.y = 0;
 
 			while (element.parentElement) {
-				controller.offset.x += element.offsetLeft;
-				controller.offset.y += element.offsetTop;
+				display_offset.x += element.offsetLeft;
+				display_offset.y += element.offsetTop;
 				element = element.parentElement;
 			}
 		}
@@ -99,25 +180,109 @@
 
 		}
 
-		function touchMoveDisplay(event_) {
+		/* So, for touch end events, you have to get the button under the changed touch or touches and see if it's no longer under a touch point. */
+		/* If it's not, then unpress it. */
+		function touchEndDisplay(event_) {
 			event_.preventDefault();
-			var touch = event_.targetTouches[0];
-			controller.moveTo(touch.pageX, touch.pageY);
+
+			/* The changed touches are the ones we're interested in. */
+			/* For a touchend event, these will be the ones that have just severed contact with the screen. Generally, there's only one, but sometimes two or more, I guess. */
+			/* So, loop through the changed touches. */
+			for (var index0 = event_.changedTouches.length - 1; index0 > -1; index0--) {
+				var touch = event_.changedTouches[index0];
+				/* Get the world position of the touch. */
+				var position_x = (touch.pageX - display_offset.x) * display_size_ratio;
+				var position_y = (touch.pageY - display_offset.y) * display_size_ratio;
+
+				/* Now we need to test the changed touch against the buttons to see if it's leaving the screen after being over a button. */
+				/* So, we have to loop over all the buttons... So tedious. */
+				for (var index1 = controller.buttons.length - 1; index1 > -1; index1--) {
+					var button = controller.buttons[index1];
+					/* Anyway, we get a button and we test to see if the position of the changed touch is over it. */
+					/* If it is, then guess what, you probably don't have to test anymore buttons, because who would stack buttons on top of each other? It's just not okay, so break when you find a button under the point. */
+					if (button.containsCoordinates(position_x, position_y)) {
+						/* Well, you found a button, but we're not done, oh, no. Not done at all. */
+						/* What if there's still another touch point over the button? Rare, but not impossible. */
+						/* So, we have to loop over all the still existing touches to see if one is still over the button. */
+						for (var index2 = event_.touches.length - 1; index2 > -1; index2--) {
+							/* I'm just recycling the touch variable, I don't care if it overwrites the old touch instance because I'm done with it. */
+							touch = event_.touches[index2];
+							/* The position on the other hand, is something we don't want to change, so I just defined the x and y positions for the current touch in the call to containsCoordinates. */
+
+							/* Now we test to see if any of these touches are over the button, and if they are, we return because it's still being pressed. */
+							if (button.containsCoordinates((touch.pageX - display_offset.x) * display_size_ratio, (touch.pageY - display_offset.y) * display_size_ratio)) {
+								return;
+							}
+						}
+						/* Finally, if the changed touch was inside the button and no other touches were over the button, we can unpress the button. */
+						button.unpress();
+						break;
+					}
+				}
+			}
 		}
 
+		/* Alright, here's another complicated touch listener. */
+		/* We have to test all of the buttons to see if they have a touch over them whenever this event occurs. */
+		function touchMoveDisplay(event_) {
+			event_.preventDefault();
+
+			/* So, first we loop through all the buttons. */
+			for (var index0 = controller.buttons.length - 1; index0 > -1; index0--) {
+				/* Get the button. */
+				var button = controller.buttons[index0];
+				/* Now, the thing about moving touches is that we don't know if they were over the button on the last update. */
+				/* This means that the button could be pressed, but has nothing over it, so it needs to be unpressed. */
+				/* How we determine which ones need to be unpressed is we simply check to see if any touches are currently still over the button. */
+				/* If a touch is over the button, this pressed variable will be set to true. */
+				/* If it's still false after all the touches are checked, then we unpress the button. */
+				var pressed = false;
+
+				/* Loop through all the touches. */
+				for (var index1 = event_.touches.length - 1; index1 > -1; index1--) {
+					/* Get the touch. */
+					var touch = event_.touches[index1];
+					/* Get the position. */
+					var position_x = (touch.pageX - display_offset.x) * display_size_ratio;
+					var position_y = (touch.pageY - display_offset.y) * display_size_ratio;
+					/* If the current touch is over the button, press it! */
+					if (button.containsCoordinates(position_x, position_y)) {
+						button.press();
+						pressed = true;
+						/* If it's pressed, it's pressed, no more need to check, break. */
+						break;
+					}
+				}
+
+				/* If you check all the touches and none of them are over the button, unpress that sucker. */
+				if (!pressed) {
+					button.unpress();
+				}
+			}
+		}
+
+		/* Touch start is the simplest of the touch listeners. */
+		/* All you have to do is get the new changedTouches and see if they are over a button. */
 		function touchStartDisplay(event_) {
 			event_.preventDefault();
-			var touch = event_.targetTouches[0];
-			controller.moveTo(touch.pageX, touch.pageY);
 
-			controller.touch_count++;
-			if (controller.touch_count > 1) {
-				controller.doAction();
-				controller.touch_count = 0;
+			/* First we loop through our buttons. */
+			for (var index0 = controller.buttons.length - 1; index0 > -1; index0--) {
+				var button = controller.buttons[index0];
+				/* Then we loop through the changed touches. */
+				for (var index1 = event_.changedTouches.length - 1; index1 > -1; index1--) {
+					var touch = event_.changedTouches[index1];
+					/* Get the position of the touch. */
+					var position_x = (touch.pageX - display_offset.x) * display_size_ratio;
+					var position_y = (touch.pageY - display_offset.y) * display_size_ratio;
+
+					if (button.containsCoordinates(position_x, position_y)) {
+						/* Press the button if the touch coordinates are over it. */
+						button.press();
+						break;
+					}
+				}
 			}
-			var timeout = window.setTimeout(function() {
-				controller.touch_count = 0;
-			}, 300);
 		}
 
 		///////////////////////
@@ -274,25 +439,30 @@
 			}
 		};
 
+		/* Okay, here it is, the grand tomatoe that handles controls. */
 		var controller = {
 			/* FUNCTIONS. */
-			doAction : function() {
-				this.action = true;
+			/* Adds a button to the buttons array. */
+			addButton : function(button_) {
+				this.buttons.push(button_);
 			},
-			moveTo : function(x_, y_) {
-				this.position.x = (x_ - this.offset.x) * this.size_ratio - map.offset.x;
-				this.position.y = (y_ - this.offset.y) * this.size_ratio - map.offset.y;
+			/* Draws those sexy buttons. */
+			draw : function() {
+				for (var index = this.buttons.length - 1; index > -1; index--) {
+					this.buttons[index].draw();
+				}
+			},
+			/* OBJECT LITERALS. */
+			/* We've gotta keep track of the "keys" being pressed. */
+			keys : {
+				down : false,
+				left : false,
+				right : false,
+				up : false
 			},
 			/* VARIABLES. */
-			/* Whether or not the user is clicking/tapping the screen. */
-			action : false,
-			offset : new Point(0, 0),
-			last_position : new Point(0, 0),
-			position : new Point(0, 0),
-			size_ratio : 1,
-			/* Used for double tap to jump. */
-			touch_count : 0,
-			velocity : new Vector(0, 0)
+			/* Check it out! Now there's a buttons array! */
+			buttons : new Array(),
 		};
 
 		/* For a fairly detailed commentary on the engine object, see the Game Loop tutorial and its source code. */
@@ -315,6 +485,7 @@
 					accumulated_time += elapsed_time;
 
 					while (accumulated_time >= interval_) {
+						/* Update the controller. */
 						red_square.update();
 						/* Gotta update the map's scroll position! */
 						map.update();
@@ -336,6 +507,9 @@
 						map.draw();
 						/* Then draw that square, sister. */
 						red_square.draw(accumulated_time / interval_);
+
+						/* That's right, we're drawing the controller now. */
+						controller.draw();
 
 						display.drawImage(buffer.canvas, 0, 0, buffer.canvas.width, buffer.canvas.height, 0, 0, display.canvas.width, display.canvas.height);
 					}
@@ -494,13 +668,15 @@
 				this.last_position.y = this.position.y;
 
 				/* ADD SOME CONTROL. */
-				var difference_x = (controller.position.x - this.position.x - this.width * 0.5) * 0.01;
-				this.velocity.x += difference_x;
 
-				this.velocity.x += controller.velocity.x * 0.01;
+				if (controller.keys.left) {
+					this.velocity.x -= 0.25;
+				} else if (controller.keys.right) {
+					this.velocity.x += 0.25;
+				}
 
-				if (controller.action && this.airborne == false) {
-					controller.action = false;
+				if (controller.keys.up && this.airborne == false) {
+					controller.keys.up = false;
 					this.airborne = true;
 					this.velocity.y -= 12;
 				}
@@ -535,6 +711,10 @@
 		var buffer = document.createElement("canvas").getContext("2d");
 		var display = html.display.getContext("2d");
 
+		/* I moved the offset and size ratio of the display canvas out of the controller object because they really don't belong in there. */
+		var display_offset = new Point(0, 0);
+		var display_size_ratio = 1;
+
 		var source_image = new Image();
 
 		//////////////////
@@ -550,11 +730,28 @@
 			window.addEventListener("resize", resizeWindow);
 
 			if ("ontouchstart" in document.documentElement) {
+				/* Since you're going to need to see the controlls to use them, we're going to need to add buttons to the controller. */
+				controller.addButton(new Button(8, 216, 32, 32, 13, 13, function() {
+					controller.keys.left = true;
+				}, function() {
+					controller.keys.left = false;
+				}));
+				controller.addButton(new Button(216, 216, 32, 32, 14, 14, function() {
+					controller.keys.up = true;
+				}, function() {
+					controller.keys.up = false;
+				}));
+				controller.addButton(new Button(48, 216, 32, 32, 15, 15, function() {
+					controller.keys.right = true;
+				}, function() {
+					controller.keys.right = false;
+				}));
+				html.display.addEventListener("touchend", touchEndDisplay);
 				html.display.addEventListener("touchmove", touchMoveDisplay);
 				html.display.addEventListener("touchstart", touchStartDisplay);
 			} else {
-				html.display.addEventListener("mousedown", mouseDownDisplay);
-				html.display.addEventListener("mousemove", mouseMoveDisplay);
+				window.addEventListener("keydown", keyDownWindow);
+				window.addEventListener("keyup", keyUpWindow);
 			}
 
 			resizeWindow();
