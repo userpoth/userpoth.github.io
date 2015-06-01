@@ -595,7 +595,9 @@
 					collider[value](object_, left, bottom);
 				}
 				bottom = Math.floor(object_.getMaximumY() / tile_sheet.tile_height);
-				var right = Math.floor(object_.getMaximumX() / tile_sheet.tile_width);
+				/* Notice that I subtracted 0.1 from the object's right coordinate. This was to fix a small rounding error and makes the collision a little smoother. */
+				/* Kind of hacky, I know, but maybe I'll figure it out in a future rendition. */
+				var right = Math.floor((object_.getMaximumX()-0.1) / tile_sheet.tile_width);
 
 				value = this.tiles[bottom * this.columns + right];
 				if (value != 999) {
