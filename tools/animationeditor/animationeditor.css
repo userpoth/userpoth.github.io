@@ -1,0 +1,41 @@
+/*************************************************/
+/* animationeditor.css. Frank Poth. 06/07/2015. */
+/***********************************************/
+#display {
+	left:0px;
+	position:fixed;
+	top:0px;
+}
+#file_input {
+	border:none;
+	height:32px;
+	left:0px;
+	margin:0px;
+	padding:0px;
+	position:fixed;
+	text-align:center;
+	top:0px;
+	width:128px;
+}
+#tile_height {
+	border:none;
+	height:32px;
+	left:64px;
+	margin:0px;
+	padding:0px;
+	position:fixed;
+	text-align:center;
+	top:32px;
+	width:64px;
+}
+#tile_width {
+	border:none;
+	height:32px;
+	left:0px;
+	margin:0px;
+	padding:0px;
+	position:fixed;
+	text-align:center;
+	top:32px;
+	width:64px;
+}
