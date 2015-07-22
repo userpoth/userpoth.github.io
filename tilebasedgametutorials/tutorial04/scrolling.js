@@ -597,7 +597,9 @@
 				bottom = Math.floor(object_.getMaximumY() / tile_sheet.tile_height);
 				/* Notice that I subtracted 0.1 from the object's right coordinate. This was to fix a small rounding error and makes the collision a little smoother. */
 				/* Kind of hacky, I know, but maybe I'll figure it out in a future rendition. */
-				var right = Math.floor((object_.getMaximumX()-0.1) / tile_sheet.tile_width);
+				/* 07/16/2015 I noticed a bug when I use 0.1 where the red square can sometimes drop through adjacent solid full and half tiles on their left side as a result of subtracting 0.1. */
+				/* I used 0.001 instead and this reduces the probability of that happening... Not sure why it happens still, though. Haven't been expending too much brain power on this. */
+				var right = Math.floor((object_.getMaximumX()-0.001) / tile_sheet.tile_width);
 
 				value = this.tiles[bottom * this.columns + right];
 				if (value != 999) {

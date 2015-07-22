@@ -26,7 +26,6 @@
 			this.y = y_;
 		}
 
-
 		Button.prototype = {
 			/* FUNCTIONS. */
 			/* Tests to see if the specified coordinates are inside the rectangle or not. */
