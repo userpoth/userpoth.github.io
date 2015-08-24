@@ -1,15 +1,86 @@
 /***************************************/
 /* index.css. Frank Poth. 04/15/2015. */
 /*************************************/
-#background_canvas {
+.DataBox {
+	background-color:rgba(0,0,0,0.5);
+	/*border-radius:32px; /* Seems to make things super laggy... */
+	/*border-color:#606060;
+	border-style:solid;
+	border-width:2px;*/
+	box-sizing:border-box;
+	color:#f0f0f0;
+	display:none;
+	font-family: "Press Start 2P", cursive;
+	left:0px;
+	line-height:150%;
+	margin:0;
+	overflow:auto;
+	padding:16px;
+	position:fixed;
+	top:0px;
+	-webkit-transform: translateZ(0);
+}
+.DataBox a{
+	color:#f0f090;
+	font-family: "Press Start 2P", cursive;
+	font-size:1.2em;
+	text-decoration:none;
+}
+.DataButton {
+	align-items:center;
+	background-color:rgba(0,0,0,0.5);
+	/*border-radius:16px;
+	border-color:#606060;
+	border-style:solid;
+	border-width:2px;*/
+	box-sizing:border-box;
+	color:#f0f0f0;
+	cursor:pointer;
+	display:flex;
+	font-family: "Press Start 2P", cursive;
+	height:80%;
+	justify-content:center;
+	margin:0 1% 0 1%;
+	padding:0;
+	user-select:none;
+	vertical-align:middle;
+	width:20%;
+	
+	-moz-user-select:-moz-none;
+	-ms-user-select:none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	-webkit-user-select:none;
+}
+.DataButton:hover {
+	background-color:rgba(0,0,0,0.2);
+}
+#display {
 	left:0px;
 	position:fixed;
 	top:0px;
 	z-index:-1;
 }
-#foreground_canvas {
-	left:0px;
+#footer {
+	bottom:0px;
+	height:10%;
+	position:fixed;
+}
+#header {
+	align-items:center;
+	display:flex;
+	height:10%;
+	justify-content:center;
+	margin:0;
+	padding:0;
 	position:fixed;
 	top:0px;
-	z-index:-1;
+	width:100%;
+}
+body {
+	background-color:#f0f0f0;
+	height:100%;
+	margin:0;
+	overflow:hidden;
+	padding:0;
+	width:100%;
 }

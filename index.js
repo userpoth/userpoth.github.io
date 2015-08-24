@@ -2,40 +2,120 @@
 /* index.js. Frank Poth. 07/19/2015. */
 //////////////////////////////////////
 
-/* Okay, so what I'm going for here is a site that's heavy on graphics and a very video game feel. */
-/* There's gonna be a little guy who guides you around the site with a word bubble and touch/click options. */
-/* He'll be fully animated and help you navigate from area to area, which will work like a big scrolling world. */
-/* Basically, it will be a little guy, a text bubble, and some nice background stuff. Maybe a few more little animations. */
-
 (
 	function index() {
 		///////////////
 		/* CLASSES. */
 		/////////////
 
+		function DataBox(id_, offset_) {
+			this.displayed = false;
+			this.element = document.getElementById(id_);
+			this.offset = offset_;
+			this.left_neighbor = undefined;
+			this.right_neighbor = undefined;
+		}
+
+
+		DataBox.prototype = {
+			/* FUNCTIONS. */
+			alignElement : function() {
+				var box_width = client_width * 0.9;
+				var box_height = client_height * 0.8;
+				this.element.style.height = box_height + "px";
+				this.element.style.left = (client_width - box_width) * 0.5 + "px";
+				this.element.style.top = (client_height - box_height) * 0.5 + "px";
+				this.element.style.width = box_width + "px";
+			},
+			getScrollOffset : function() {
+				return Math.floor(this.offset - background.visible_width * 0.5);
+			},
+			hideElement : function() {
+				this.displayed = false;
+				this.element.style.display = "none";
+			},
+			setNeighbors : function(left_neighbor_, right_neighbor_) {
+				this.left_neighbor = left_neighbor_;
+				this.right_neighbor = right_neighbor_;
+			},
+			showElement : function() {
+				this.displayed = true;
+				this.element.style.display = "block";
+			},
+			toggleElement : function() {
+				if (this.displayed) {
+					this.displayed = false;
+					this.element.style.display = "none";
+					return;
+				}
+				this.displayed = true;
+				this.element.style.display = "block";
+			},
+			/* VARIABLES. */
+		};
+
 		/////////////////
 		/* FUNCTIONS. */
 		///////////////
 
+		function clickDataButton(event_) {
+			event_.preventDefault();
+
+			var last_box = current_box;
+
+			switch(this.id) {
+				case "home_button":
+					current_box = home_box;
+					break;
+				case "tutorials_button":
+					current_box = tutorials_box;
+					break;
+				case "games_button":
+					current_box = games_box;
+					break;
+				case "tools_button":
+					current_box = tools_box;
+					break;
+				case "miscellaneous_button":
+					current_box = miscellaneous_box;
+					break;
+				case "art_button":
+					current_box = art_box;
+					break;
+			}
+
+			current_box.alignElement();
+
+			if (current_box != last_box) {
+				last_box.hideElement();
+				if (Math.abs(current_box.getScrollOffset() - last_box.getScrollOffset()) < background_image.width * 0.5) {
+					/* True is short jump false is wrap jump. */
+				}
+				background.startScroll(current_box.getScrollOffset());
+			} else {
+				current_box.toggleElement();
+			}
+		}
+
 		function resizeWindow(event_) {
-			/* Okay, so first you want to get the actual screen size. */
-			var client_height = document.documentElement.clientHeight;
-			var client_width = document.documentElement.clientWidth;
+			client_height = document.documentElement.clientHeight;
+			client_width = document.documentElement.clientWidth;
 
-			var map_height = map.rows * tile_sheet.tile_height;
-			var map_height_ratio = client_height / map_height;
-			var scaled_tile_width = map_height_ratio * tile_sheet.tile_width;
+			/* 64 is the height of the background image in pixels. */
+			background.height_ratio = client_height / 64;
 
-			map.visible_columns = Math.floor(client_width / scaled_tile_width);
+			background.visible_width = Math.floor(client_width / background.height_ratio);
 
-			/* The full height of the map will be applied to the buffer. */
-			background_buffer.canvas.height = map_height;
-			background_buffer.canvas.width = map.visible_columns * tile_sheet.tile_width;
+			buffer.canvas.height = 64;
+			buffer.canvas.width = background.visible_width;
 			/* The full height of the screen will be applied to the display. */
-			background_display.canvas.height = client_height;
-			background_display.canvas.width = client_width;
+			display.canvas.height = client_height;
+			display.canvas.width = client_width;
 
-			current_screen.drawBackground();
+			current_box.alignElement();
+			background.startScroll(current_box.getScrollOffset());
+
+			background.draw();
 		}
 
 		function startLoadImage(image_, url_, callback_) {
@@ -48,7 +128,7 @@
 				image_.removeEventListener("error", errorImage);
 				image_.removeEventListener("load", loadImage);
 
-				alert("Unfortunately there was an error loading the super sweet graphics for this page!");
+				alert("There was an error loading the one graphic this example uses and the programmer was too lazy to implement a fallback operation. Try visualizing some awesome graphics right here.");
 			}
 
 			function loadImage(event_) {
@@ -64,165 +144,87 @@
 		/* OBJECT LITERALS. */
 		/////////////////////
 
-		var engine = {
+		var background = {
 			/* FUNCTIONS. */
-			start : function(interval_) {
-				var accumulated_time = interval_;
-				var current_time = undefined;
-				var elapsed_time = undefined;
+			draw : function() {
+				/* Look at all this crap. HTML5!!! WHY? */
+				display.mozImageSmoothingEnabled = false;
+				display.webkitImageSmoothingEnabled = false;
+				display.msImageSmoothingEnabled = false;
+				display.imageSmoothingEnabled = false;
+
+				if (this.offset < 0) {
+					/* The background needs to wrap around the left side. */
+					buffer.drawImage(background_image, background_image.width + this.offset, 0, -this.offset, 64, 0, 0, -this.offset, 64);
+				} else if (this.offset > background_image.width - this.visible_width) {
+					/* The background needs to wrap around the right side. */
+					var width = this.visible_width - background_image.width + this.offset;
+					buffer.drawImage(background_image, 0, 0, width, 64, this.visible_width - width, 0, width, 64);
+				}
+
+				buffer.drawImage(background_image, this.offset, 0, this.visible_width, 64, 0, 0, buffer.canvas.width, buffer.canvas.height);
+				display.drawImage(buffer.canvas, 0, 0, buffer.canvas.width, buffer.canvas.height, 0, 0, display.canvas.width, display.canvas.height);
+			},
+			startScroll : function(x_) {
 				var handle = this;
-				var last_time = Date.now();
-
-				(function logic() {
-					handle.timeout = window.setTimeout(logic, interval_);
-
-					current_time = Date.now();
-					elapsed_time = current_time - last_time;
-					last_time = current_time;
-
-					accumulated_time += elapsed_time;
-
-					while (accumulated_time >= interval_) {
-						accumulated_time -= interval_;
-						/* The reason the scrolling looks jittery is because of this engine. */
-						map.update();
-
-						current_screen.update();
-					}
-				})();
-
+				window.cancelAnimationFrame(this.animation_frame);
 				(function render(time_stamp_) {
 					handle.animation_frame = window.requestAnimationFrame(render);
-
-					if (accumulated_time < interval_) {
-						current_screen.drawForeground();
-
-						map.draw();
-
-						background_display.drawImage(background_buffer.canvas, 0, 0, background_buffer.canvas.width, background_buffer.canvas.height, 0, 0, background_display.canvas.width, background_display.canvas.height);
+					if (handle.offset > x_) {
+						handle.offset--;
+						handle.draw();
+					} else if (handle.offset < x_) {
+						handle.offset++;
+						handle.draw();
+					} else {
+						/* Show the box only after you're done scrolling. It's just classier that way. =) */
+						current_box.showElement();
+						window.cancelAnimationFrame(handle.animation_frame);
 					}
 				})();
-			},
-			stop : function() {
-				window.cancelAnimationFrame(this.animation_frame);
-				window.clearTimeout(this.timeout);
-				this.animation_frame = this.timeout = undefined;
 			},
 			/* VARIABLES. */
 			animation_frame : undefined,
-			timeout : undefined
-		};
-
-		var home_screen = {
-			/* FUNCTIONS. */
-			drawBackground : function() {
-				map.draw();
-			},
-			drawForeground : function() {
-
-			},
-			start : function() {
-				this.drawBackground();
-			},
-			update : function() {
-
-			}
-			/* VARIABLES. */
-
-		};
-
-		/* Little dude is the little dude who guides you around the page! */
-		var little_dude = {};
-
-		/* The map for the background. */
-		var map = {
-			/* FUNCTIONS. */
-			draw : function() {
-				var scroll_offset = this.offset % tile_sheet.tile_width;
-				var start_column = Math.floor(this.offset / tile_sheet.tile_width);
-				for (var column = 0; column < this.visible_columns; column++) {
-					for (var row = 0; row < this.rows; row++) {
-
-						var value = this.values[row * this.columns + ((column + start_column) % this.columns)];
-						background_buffer.drawImage(source_image, (value % tile_sheet.columns) * tile_sheet.tile_width, Math.floor(value/tile_sheet.columns)*tile_sheet.tile_height, tile_sheet.tile_width, tile_sheet.tile_height, column * tile_sheet.tile_width - scroll_offset, row * tile_sheet.tile_height, tile_sheet.tile_width, tile_sheet.tile_height);
-					}
-				}
-			},
-			update : function() {
-				this.offset -= 1;
-				/* Okay, so, you'll be scrolling left and right and the map is just going to repeat/loop around. */
-				/* This means that when you go left, offset will be negative. This can't happen, so when it's less than 0, all you need to do is add the length of the map to it. */
-				if (this.offset < 0) {
-					this.offset += this.columns * tile_sheet.tile_width;
-				}
-			},
-			/* VARIABLES. */
-			columns : 32,
-			/* The horizontal scroll offset. */
+			height_ratio : undefined,
 			offset : 0,
-			rows : 32,
-			values : [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 3, 2, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 2, 2, 2, 2, 3, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 2, 3, 3, 3, 3, 2, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 2, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 3, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 2, 1, 2, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 1, 1, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 21, 21, 21, 21, 21, 21, 20, 20, 21, 21, 21, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 22, 22, 22, 22, 22, 22, 21, 21, 21, 40, 41, 41, 41, 41, 40, 40, 40, 40, 41, 42, 42, 42, 42, 42, 42, 42, 42, 43, 43, 43, 43, 43, 42, 42, 43, 43, 43, 43, 42, 41, 41, 21, 22, 21, 21, 21, 21, 20, 20, 21, 21, 23, 22, 23, 22, 21, 22, 20, 21, 22, 23, 22, 21, 20, 21, 21, 22, 23, 22, 20, 21, 20, 22, 22, 23, 22, 22, 22, 20, 20, 21, 23, 23, 23, 22, 21, 20, 21, 21, 20, 20, 21, 22, 20, 21, 20, 20, 20, 20, 21, 21, 20, 20, 20, 20],
-			/* The number of columns that fit on the screen. */
-			visible_columns : 0
-		};
-
-		var tile_sheet = {
-			/* VARIABLES. */
-			columns : 20,
-			tile_height : 16,
-			tile_width : 16
-		};
-
-		/* This is the screen transition. I want to scroll the background image from one screen to the next and have the little dude run to catch up. */
-		var transition = {
-			/* FUNCTIONS. */
-			draw : function() {
-
-			},
-			update : function() {
-
-			}
-			/* VARIABLES. */
+			visible_width : undefined
 		};
 
 		/////////////////
 		/* VARIABLES. */
 		///////////////
 
-		/* This is the first time I'll be using two canvases for display. */
-		/* I want to cut back on unecessary blitting to speed up the site and since I plan on using static backgrounds, there's no need to do all that extra work. */
+		var home_box = new DataBox("home_box", 32);
+		var tutorials_box = new DataBox("tutorials_box", 96);
+		var games_box = new DataBox("games_box", 160);
+		var tools_box = new DataBox("tools_box", 224);
+		var miscellaneous_box = new DataBox("miscellaneous_box", 288);
+		var art_box = new DataBox("art_box", 352);
 
-		/* Background canvas buffers. */
-		var background_buffer = document.createElement("canvas").getContext("2d");
-		var background_display = document.getElementById("background_canvas").getContext("2d");
+		var background_image = new Image();
 
-		/* The current screen keeps track of which screen the user is viewing and which logic to run. */
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/* You should set this using cookies so you return to the screen you were previously on instead of always going home. */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		var current_screen = home_screen;
-
-		/* Foreground canvas buffers. */
-		var foreground_buffer = document.createElement("canvas").getContext("2d");
-		var foreground_display = document.getElementById("foreground_canvas").getContext("2d");
-
-		/* This is the height to width ratio. I want to develop for mobile, and that usually means tall and skinny. */
-		var screen_size_ratio = 2;
-
-		/* The source image. */
-		var source_image = new Image();
+		var buffer = document.createElement("canvas").getContext("2d");
+		var current_box = undefined;
+		var client_height;
+		var client_width;
+		var display = document.getElementById("display").getContext("2d");
 
 		//////////////////
 		/* INITIALIZE. */
 		////////////////
 
-		window.addEventListener("resize", resizeWindow);
+		document.getElementById("art_button").addEventListener("click", clickDataButton);
+		document.getElementById("games_button").addEventListener("click", clickDataButton);
+		document.getElementById("home_button").addEventListener("click", clickDataButton);
+		document.getElementById("miscellaneous_button").addEventListener("click", clickDataButton);
+		document.getElementById("tools_button").addEventListener("click", clickDataButton);
+		document.getElementById("tutorials_button").addEventListener("click", clickDataButton);
 
-		startLoadImage(source_image, "index.png", function() {
+		startLoadImage(background_image, "mainbackground.png", function() {
+			window.addEventListener("resize", resizeWindow);
+			current_box = home_box;
+			current_box.showElement();
 			resizeWindow();
-
-			current_screen.start();
-
-			engine.start(1000 / 30);
 		});
+
 	})();

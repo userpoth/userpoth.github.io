@@ -1,0 +1,39 @@
+/****************************************/
+/* toader.css. Frank Poth. 08/20/2015. */
+/**************************************/
+
+#details_container{
+	color:#f0f0f0;
+	display:block;
+	margin:0 auto;
+	width:480px;
+}
+
+#details_container a{
+	color:#00c0f0;
+	text-decoration:none;
+}
+
+#details_container ul{
+	color:#c0c0c0;
+}
+
+#swf_container{
+	display:flex;
+	justify-content:center;
+	padding:0;
+	width:100%;
+}
+
+body{
+	background-color:#303030;
+	height:100%;
+	margin:0;
+	padding:0;
+	width:100%;
+}
+
+h1{
+	color:#f0f0f0;
+	text-align:center;
+}
