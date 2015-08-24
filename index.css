@@ -38,6 +38,7 @@
 	cursor:pointer;
 	display:flex;
 	font-family: "Press Start 2P", cursive;
+	font-size:0.75em;
 	height:80%;
 	justify-content:center;
 	margin:0 1% 0 1%;
