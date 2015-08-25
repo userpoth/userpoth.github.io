@@ -22,9 +22,13 @@
 }
 .DataBox a{
 	color:#f0f090;
+	display:absolute;
 	font-family: "Press Start 2P", cursive;
 	font-size:1.2em;
 	text-decoration:none;
+}
+.DataBox a:hover{
+	font-weight:bolder;
 }
 .DataButton {
 	align-items:center;
@@ -42,10 +46,12 @@
 	height:80%;
 	justify-content:center;
 	margin:0 1% 0 1%;
+	overflow:hidden;
 	padding:0;
 	user-select:none;
 	vertical-align:middle;
 	width:20%;
+	word-wrap:normal;
 	
 	-moz-user-select:-moz-none;
 	-ms-user-select:none;
