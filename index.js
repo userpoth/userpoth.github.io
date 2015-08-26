@@ -12,8 +12,6 @@
 			this.displayed = false;
 			this.element = document.getElementById(id_);
 			this.offset = offset_;
-			this.left_neighbor = undefined;
-			this.right_neighbor = undefined;
 		}
 
 
@@ -33,10 +31,6 @@
 			hideElement : function() {
 				this.displayed = false;
 				this.element.style.display = "none";
-			},
-			setNeighbors : function(left_neighbor_, right_neighbor_) {
-				this.left_neighbor = left_neighbor_;
-				this.right_neighbor = right_neighbor_;
 			},
 			showElement : function() {
 				this.displayed = true;
@@ -180,16 +174,17 @@
 						/* Show the box only after you're done scrolling. It's just classier that way. =) */
 						current_box.showElement();
 						window.cancelAnimationFrame(handle.animation_frame);
+						/* Also, store a cookie so you know where to start scrolling when you start up again! */
+						document.cookie=current_box.element.id;
 					}
 				})();
 			},
 			/* VARIABLES. */
 			animation_frame : undefined,
 			height_ratio : undefined,
-			offset : 0,
+			offset :0,
 			visible_width : undefined
 		};
-
 		/////////////////
 		/* VARIABLES. */
 		///////////////
@@ -222,9 +217,11 @@
 
 		startLoadImage(background_image, "mainbackground.png", function() {
 			window.addEventListener("resize", resizeWindow);
-			current_box = home_box;
+			current_box = eval(document.cookie)||home_box;
+			background.offset=current_box.offset;
 			current_box.showElement();
 			resizeWindow();
+			
 		});
 
 	})();

@@ -1,0 +1,151 @@
+/********************************************/
+/* mobilepong.css. Frank Poth. 08/25/2015. */
+/******************************************/
+#header {
+	align-items:center;
+	background-color:rgba(0,0,0,0.8);
+	display:flex;
+	height:10%;
+	justify-content:center;
+	left:0px;
+	margin:0;
+	padding:0;
+	position:fixed;
+	top:0px;
+	width:100%;
+}
+#header h1 {
+	color:#f0f090;
+	display:inline-block;
+	margin:0;
+	padding:0;
+}
+#container {
+}
+#content {
+	background-color:rgba(0,0,0,0.5);
+	box-sizing:border-box;
+	height:65%;
+	left:2.5%;
+	margin:0;
+	overflow:auto;
+	padding:1% 2.5% 0 2.5%;
+	position:fixed;
+	top:12.5%;
+	width:95%;
+}
+#content a {
+	color:#f0f0c0;
+	text-decoration:none;
+}
+#content h2 {
+	color:#f0f0f0;
+	font-size:200%;
+	margin:0 0 1% 0;
+	padding:0;
+}
+#content p {
+	color:#f0f0f0;
+}
+#launch_button {
+	background-color:rgba(0,0,0,0.3);
+	box-sizing:border-box;
+	color:#f0f090;
+	cursor:pointer;
+	display:inline;
+	margin:0;
+	padding:0.5%;
+	user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	-webkit-user-select:none;
+}
+#launch_button:hover {
+	background-color:rgba(255,255,255,0.3);
+	font-weight:bolder;
+}
+#close_button {
+	background-color:rgba(255,0,0,0.5);
+	color:#f0f0f0;
+	cursor:pointer;
+	display:none;
+	height:32px;
+	left:0px;
+	line-height:32px;
+	margin:0;
+	padding:0;
+	position:fixed;
+	text-align:center;
+	top:0px;
+	user-select:none;
+	width:32px;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	-webkit-user-select:none;
+}
+#close_button:hover {
+	font-weight:bolder;
+}
+#bottom_links {
+	align-items:center;
+	background-color:rgba(0,0,0,0.5);
+	display:flex;
+	height:10%;
+	justify-content:center;
+	left:2.5%;
+	margin:0;
+	padding:0;
+	position:fixed;
+	top:77.5%;
+	width:95%;
+}
+#bottom_links a {
+	color:#f0f0c0;
+	display:inline;
+	text-align:center;
+	text-decoration:none;
+	width:33.33%;
+}
+#footer {
+	align-items:center;
+	background-color:rgba(0,0,0,0.8);
+	bottom:0px;
+	display:flex;
+	height:10%;
+	justify-content:center;
+	left:0px;
+	margin:0;
+	padding:0;
+	position:fixed;
+	width:100%;
+}
+#footer a {
+	color:#f0f090;
+	text-decoration:none;
+}
+#display {
+	display:none;
+	left:0px;
+	margin:0;
+	padding:0;
+	position:fixed;
+	top:0px;
+}
+a:hover {
+	font-weight:bolder;
+}
+body {
+	background:url("mobilepongbackground.png");
+	height:100%;
+	margin:0;
+	padding:0;
+	width:100%;
+}
+pre{
+	background-color:rgba(255,255,255,0.1);
+	box-sizing:border-box;
+	color:#f0f0f0;
+	margin:0;
+	overflow-x:scroll;
+	padding:1%;
+}

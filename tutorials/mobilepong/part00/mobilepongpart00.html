@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+
+<!---------------------------------------------------->
+<!-- mobilepongpart00.html. Frank Poth. 08/26/2015. -->
+<!---------------------------------------------------->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Make sure to use the propper meta tags. -->
+		<meta charset="UTF-8">
+		<meta name="author" content="Frank Poth">
+		<meta name="description" content="Learn how to program Pong using HTML5 and JavaScript! Part0">
+		<meta name="keywords" content="HTML5,CSS,JavaScript">
+		<!-- This meta tag is especially important for mobile games because it keeps things scaled nicely. -->
+		<meta name="viewport" content="width=device-width">
+
+		<!-- Link in CSS styles. -->
+		<link href="../mobilepong.css" rel="stylesheet" type="text/javascript">
+		<!-- Title. -->
+		<title>mobilepongpart00</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<div id="header">
+			<h1>Mobile Pong</h1>
+		</div>
+		<div id="content">
+			<h2>Part0</h2>
+			<p>
+				Welcome to Part0 of the Mobile Pong tutorial! Let's get to it!
+			</p>
+			<p>
+				To set up any browser game you will need at least two things: an HTML file, and a JavaScript file. You might want to add a CSS file, but that might not be necessary. One thing that is pretty important to include in any page you want to display on a mobile device is this meta tag, which keeps everything scaled nicely:
+			</p>
+			<pre>&lt;meta name=”viewport” content=”width=device-width”/&gt;</pre>
+			<p>
+				That's pretty darn important and keeps your content looking nice and scaled to the proper size. Make sure to include it in the
+				&lt;head&gt;
+				tag of your HTML page. One other thing that is pretty important is placement of your
+				&lt;script&gt;
+				tag. You want to place it at the very bottom of the &lt;body&gt; tag if it needs to access any elements in the body, like a canvas element, which you will need to display your game. The reason for this placement is that when the page loads, each element will be loaded in the order that it appears in your HTML file. So, placing your &lt;script&gt; tag at the bottom of the body ensures that all of your elements will be loaded and ready to use by the time your script runs.
+			</p>
+			<p>
+				Now for the actual thing this tutorial is about: scaling the canvas. Since your game is running on mobile devices that range in size from small phones to large tablets and even some laptops, you need to be sure that your game can scale smoothly to any size you need it to while still looking pretty good. If you hit the <span id="launch_button">View Example</span> button, you will see a window pop up that will fill all of the screen on one axis and be centered in the screen on the other. Why not fill the whole screen? Because of scaling, that's why. You always want to maintain the proportional size of your game when you scale, and chances are the various devices out there aren't going to facilitate that for you. But the technique employed here is pretty solid, and any empty space can be filled in with background color or even a stretchable options pane if you wanted to really utilize extra space in a proactive manner.
+			</p>
+			<p>
+				Now for some code. All of this scaling takes place in a resize event handler. The reason why is because your game should always scale to whatever the screen size might be, and on mobile devices this can change quite a bit. So, here's the resize function:
+			</p>
+			<pre>function resizeWindow(event_) {
+	client_height = document.documentElement.clientHeight;
+	client_width = document.documentElement.clientWidth;
+
+	var height_ratio = client_height / game_height;
+	var width_ratio = client_width / game_width;
+
+	if (height_ratio < width_ratio) {
+		display.canvas.height = game_height * height_ratio;
+		display.canvas.width = game_width * height_ratio;
+
+		display.canvas.style.left = Math.floor((client_width - display.canvas.width) * 0.5) + "px";
+	} else {
+		display.canvas.height = game_height * width_ratio;
+		display.canvas.width = game_width * width_ratio;
+
+		display.canvas.style.top = Math.floor((client_height - display.canvas.height) * 0.5) + "px";
+	}
+}</pre>
+			<p>
+				The first thing you want to do is get the actual height and width of the client window. This is pretty easy, just use document.documentElement to get the clientWidth and clientHeight. From here you want to get the ratio of your game screen to your client window. For example if your client window is 100px high and your game window is 20px high, you'd need a ratio by which to scale your game window to the size of the client window. You would do this by dividing 100 by 20 to get a ratio of 5. You would then multiply your display canvas's height by 5 to make it fit the window. But first you must determine which ratio to use. Width, or height?
+			</p>
+			<p>
+				How should you choose? You should choose the smaller ratio. Choosing the smaller ratio ensures that the display canvas will fit entirely inside the client window and still maintain proportionality to your original game dimensions. After you find the smaller ratio, it's a simple matter of setting the display canvas's size to the game dimensions multiplied by the smaller ratio.
+			</p>
+			<p>
+				One more thing you can do is center the canvas on the axis that isn't completely covered. This just makes things look nicer. The function sets the CSS style of the canvas to offset its position by half of the uncovered space, thus centering it in on the unfilled axis.
+			</p>
+			<p>
+				And that's it for this tutorial! I hope you found it useful. If nothing else I thought scaling a display canvas to fit the client window was a pretty useful thing to know. Please take a look at the source code for this page. It's fully commented and far more in depth/hands on than this tutorial.
+			</p>
+		</div>
+		<div id="bottom_links">
+			<a href="../index.html">Index</a>
+			<a href="#">Source</a>
+			<a href="../part01/mobilepongpart01.html">Part1</a>
+		</div>
+		<div id="footer">
+			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tutorials/mobilepong">Github Repository</a>
+		</div>
+
+		<canvas id="display">
+			&nbsp;
+		</canvas>
+		<div id="close_button">
+			X
+		</div>
+
+		<!-- calling mobilepong.js last keeps the close_button propperly lined up inside the display canvas the first time it is displayed. -->
+		<script src="mobilepongpart00.js" type="text/javascript"></script>
+		<script src="../mobilepong.js" type="text/javascript"></script>
+	</body>
+</html>
