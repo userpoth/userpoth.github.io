@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+
+<!---------------------------------------------------->
+<!-- mobilepongpart01.html. Frank Poth. 08/26/2015. -->
+<!---------------------------------------------------->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Make sure to use the propper meta tags. -->
+		<meta charset="UTF-8">
+		<meta name="author" content="Frank Poth">
+		<meta name="description" content="Learn how to program Pong using HTML5 and JavaScript! Part1">
+		<meta name="keywords" content="HTML5,CSS,JavaScript">
+		<!-- This meta tag is especially important for mobile games because it keeps things scaled nicely. -->
+		<meta name="viewport" content="width=device-width">
+
+		<!-- Link in CSS styles. -->
+		<link href="../mobilepong.css" rel="stylesheet" type="text/javascript">
+		<!-- Title. -->
+		<title>mobilepongpart01</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<div id="header">
+			<h1>Mobile Pong</h1>
+		</div>
+		<div id="content">
+			<h2>Part1 - a</h2>
+			<p>
+				Part One covers some pretty complex topics. This example implements a fixed time step game loop to run the game logic and render the graphics and implements some vector math to perform collision with the top and bottom of the screen which the ball will collide with.
+			</p>
+			<p>
+				A fixed time step game loop is different from a variable time step game loop in that it aims to run at a specified interval. Say you want your game to run at 10ms intervals. You can tell a Timeout loop to execute your game logic every 10ms and that will come pretty close to what you are looking for, but it won't be quite on target because every device is different and runs at a different speed. So, how does a truly fixed time step game loop operate? Well, you can still use a Timeout loop to keep things running uniformly, but if you really want consistent gameplay across different devices, you will need to keep track of how much time has actually passed using something like Date.now().
+			</p>
+			<p>
+				By using Date.now() to get the actual time that updates occur, we can build a more precise game loop. You do this by recording how much time has passed since the start of your loop. Say you want to update every 10ms. When the accumulated time reaches 10ms, you update the game and subtract 10ms from the accumulated time variable. If your Timeout loop runs a little longer than 10ms for whatever reason, that extra time is stored in the accumulated time variable and will eventually be used instead of being overlooked. This allows you to get the same results on a super computer and a smart phone running the same game loop! Here's some code!
+			</p>
+			<pre>
+var accumulated_time = interval_;
+var current_time = undefined;
+var elapsed_time = undefined;
+var last_time = Date.now();
+
+(function logic() {
+	window.setTimeout(logic, 10);
+
+	current_time = Date.now();
+	elapsed_time = current_time - last_time;
+	last_time = current_time;
+	accumulated_time += elapsed_time;
+
+	while (accumulated_time >= 10) {
+		accumulated_time -= 10;
+		game.update();
+	}
+})();
+</pre>
+			<p>
+				As you can see, accumulated time increases by the actual amount of time that passes between each cycle with the help of Date.now(). The game only updates if there is enough accumulated time and accumulated time is never thrown away. If you have 11ms of accumulated time and you update once, using up 10ms, there will still be 1ms left over to be considered on the next logic cycle. It's very efficient and does not waste any time. You will notice some jumps now and then depending on the speed of your machine. The ideal of running at 10ms per cycle on every machine is great, but a smart phone will have performance issues compared to a super computer. It's just the way it is.
+			</p>
+			<p>
+				Anyway, you might be wondering what to do with that left over 1ms. This is where we use interpolation to draw animations at a slight offset to make things appear to be running smoothly even though updates may not be happening at exactly 10ms intervals. This works surprisingly well with very few hiccups. It works by getting the distance an object moves from one frame to the next and scaling it down by a time step ratio. This ratio is always between less than 0 and less than 1. Here's some code to show how it works:
+			</p>
+			<pre>
+draw : function(time_step_) {
+	var interpolated_x = this.last_position.x + (this.current_position.x - this.last_position.x) * time_step_;
+	var interpolated_y = this.last_position.y + (this.current_position.y - this.last_position.y) * time_step_;
+	
+	buffer.fillStyle = this.fill_style;
+	buffer.fillRect(interpolated_x, interpolated_y, this.width, this.height);
+},
+</pre>
+			<p>
+				In the above code, "this" refers to the ball object.
+			</p>
+			<p>
+				The time step is a ratio that is determined by dividing the accumulated time variable by the desired fixed time interval. Drawing only occurs when the accumulated time is less than the fixed time interval because if it is greater, then the game has not updated yet and there is nothing new to be rendered.
+			</p>
+			<p>
+				This example uses RequestAnimationFrame to handle the drawing loop. Here's the code:
+			</p>
+			<pre>
+(function render(time_stamp_) {
+	window.requestAnimationFrame(render)
+
+	if (accumulated_time < interval_) {
+		game.draw(accumulated_time / 10);
+	}
+})();
+</pre>
+			<p>
+				You can see that the time steps is determined by dividing accumulated time by the specified interval 10ms. That value is used to interpolate the position of moving objects like a ball in a Pong game.
+			</p>
+			<p>
+				RequestAnimationFrame is useful because it only executes when the device is ready to draw. This means it won't run every 10ms, but it will run whenever the device can actually handle new display input. This is great because it optimizes things for us a bit. This way our logic runs at 10ms intervals using Timeout and our graphics are updated whenever possible. Not a bad setup.
+			</p>
+			<h2>Part 1 - b</h2>
+			<p>
+				Now onto Part 2 of this tutorial. There are two ways of making things move in a two dimensional space. You can separate movement velocities like in a platforming game, where moving side to side and jumping/falling don't really effect each other, or you can have one movement velocity and a direction, which is more realistic. For Pong, I choose to use a single velocity and a direction. This allows much more consistent movement in any direction than you could achieve with separated movement velocities, but it also introduces some more complex math to make it work right.
+			</p>
+			<p>
+				Here's how simply moving the ball looks (where "this" is the ball):
+			</p>
+			<pre>
+this.current_position.x += Math.cos(this.direction) * this.velocity;
+this.current_position.y += Math.sin(this.direction) * this.velocity;
+</pre>
+			<p>
+				We have to use sine and cosine to convert direction, which is a radian value, into unit sized vector measurements. If you don't know what radians are, I suggest you look them up along with unit circles, because they are what this type of movement is based on. Anyway, this isn't the complex part. The complex part comes when doing collision with the top and bottom of the game board.
+			</p>
+			<p>
+				So, collision with the top and bottom of the game board requires some vector math which is a little more complex than I thought a Pong game would require. Before You can understand how it works, you have to know some things about vectors. Getting Dot Product, magnitude, normals and unit sized vectors are all things you should know about before examining the formula for vector reflection, which is what I'm about to show you. That formula is as follows:
+			</p>
+			<pre>
+reflection_vector = movement_vector – 2 * ( movement_vector dot unit_normal_of_wall_vector ) * unit_normal_of_wall_vector;
+</pre>
+			<p>
+				So, to explain this a bit, the reflection_vector is the vector you want your ball to bounce off the wall on. The ball is approaching the wall along its movement_vector. The unit_normal_of_wall_vector is the unit sized perpendicular vector to the vector that describes the wall. Here's the code that implements the formula:
+			</p>
+			<pre>
+var wall_normal = new Vector(0, -1);
+var ball_vector = new Vector(ball.current_position.x - ball.last_position.x, ball.current_position.y - ball.last_position.y);
+
+var reflection_x = ball_vector.x - 2 * (ball_vector.getDotProduct(wall_normal)) * wall_normal.x;
+var reflection_y = ball_vector.y - 2 * (ball_vector.getDotProduct(wall_normal)) * wall_normal.y;
+
+ball.direction = Math.atan2(reflection_y, reflection_x);
+</pre>
+			<p>
+				That code describes collision resolution with the top wall of the Pong game board. The wall vector runs from left to right and the unit size of its vector is (1, 0). The normal of that vector is (0, -1). The ball vector is described by its current position minus its last position. The reflection vector is broken into its x and y measurements and solved by the reflection formula. If you want to really get to know this formula, I suggest sitting down with some graph paper and doing some math. You can also look at the source code for a more comprehensive explanation of how the code works.
+			</p>
+			<p>
+				Anyway, that's it for this tutorial! Check out the example: <span id="launch_button">Launch Example</span>!
+			</p>
+		</div>
+		<div id="bottom_links">
+			<a href="../part00/mobilepongpart00.html">Part0</a>
+			<a href="../index.html">Index</a>
+			<a href="../part01/mobilepongpart02.html">Part2</a>
+		</div>
+		<div id="footer">
+			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tutorials/mobilepong">Github Repository</a>
+		</div>
+
+		<canvas id="display">
+			&nbsp;
+		</canvas>
+		<div id="close_button">
+			X
+		</div>
+
+		<!-- calling mobilepong.js last keeps the close_button propperly lined up inside the display canvas the first time it is displayed. -->
+		<script src="mobilepongpart01.js" type="text/javascript"></script>
+		<script src="../mobilepong.js" type="text/javascript"></script>
+	</body>
+</html>

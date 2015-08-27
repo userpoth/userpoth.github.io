@@ -33,6 +33,7 @@
 			if (document.documentElement.clientHeight > document.documentElement.clientWidth) {
 				display.style.display = "none";
 				close_button.style.display = "none";
+			} else {
 				close_button.style.left = display.style.left;
 				close_button.style.top = display.style.top;
 			}

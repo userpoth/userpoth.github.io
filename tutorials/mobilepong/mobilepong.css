@@ -84,6 +84,7 @@
 	-webkit-user-select:none;
 }
 #close_button:hover {
+	background-color:rgba(255,128,128,0.5);
 	font-weight:bolder;
 }
 #bottom_links {
