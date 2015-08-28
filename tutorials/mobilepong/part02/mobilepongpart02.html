@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+
+<!---------------------------------------------------->
+<!-- mobilepongpart02.html. Frank Poth. 08/27/2015. -->
+<!---------------------------------------------------->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<!-- Make sure to use the propper meta tags. -->
+		<meta charset="UTF-8">
+		<meta name="author" content="Frank Poth">
+		<meta name="description" content="Learn how to program Pong using HTML5 and JavaScript! Part2">
+		<meta name="keywords" content="HTML5,CSS,JavaScript">
+		<!-- This meta tag is especially important for mobile games because it keeps things scaled nicely. -->
+		<meta name="viewport" content="width=device-width">
+
+		<!-- Link in CSS styles. -->
+		<link href="../mobilepong.css" rel="stylesheet" type="text/css">
+		<!-- Title. -->
+		<title>mobilepongpart02</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<div id="header">
+			<h1>Mobile Pong</h1>
+		</div>
+		<div id="content">
+			<h2>Part2</h2>
+			<p>
+				Well, Part two is a little lack luster in comparison to the last two tutorials. Not much has changed, but I did add some paddles and they're fully equipped with the same collision technique used on the walls. Everything is pretty straight forward in the source code, so I suggest you take a look! Also, take a look at the example, which is Pong! <span id="launch_button">Launch Example</span>
+			</p>
+		</div>
+		<div id="bottom_links">
+			<a href="../part01/mobilepongpart01.html">Part1</a>
+			<a href="../index.html">Index</a>
+			<a href="../part03/mobilepongpart03.html">Part3</a>
+		</div>
+		<div id="footer">
+			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tutorials/mobilepong">Github Repository</a>
+		</div>
+
+		<canvas id="display">
+			&nbsp;
+		</canvas>
+		<div id="close_button">
+			X
+		</div>
+
+		<!-- calling mobilepong.js last keeps the close_button propperly lined up inside the display canvas the first time it is displayed. -->
+		<script src="mobilepongpart02.js" type="text/javascript"></script>
+		<script src="../mobilepong.js" type="text/javascript"></script>
+	</body>
+</html>

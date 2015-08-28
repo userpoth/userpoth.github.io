@@ -166,6 +166,8 @@
 
 		/* This will initialize the game. */
 		function start() {
+			/* Stop the engine just in case it's already running. This function is called every time the Launch Button is hit. */
+			engine.stop();
 			/* Start the engine at 60fps. Why not? This is a simple game, run it at FULL SPEED, CAPTAIN!!! */
 			engine.start(1000 / 60);
 			display.canvas.addEventListener("touchstart", touchStartDisplay);
