@@ -1,0 +1,70 @@
+/***************************************/
+/* index.css. Frank Poth. 09/01/2015. */
+/*************************************/
+
+/* Add a little razzle to the projects page. */
+
+#container {
+	height: 90%;
+	left: 0px;
+	margin: 0;
+	overflow: auto;
+	padding: 0;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+}
+
+#footer {
+	align-items: center;
+	bottom: 0px;
+	display: flex;
+	height: 10%;
+	justify-content: center;
+	left: 0px;
+	margin: 0;
+	padding: 0;
+	position: fixed;
+	width: 100%;
+}
+
+#footer a {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.LinkBox {
+	background-color: #808080;
+	box-sizing: border-box;
+	color: #f0f0f0;
+	display: block;
+	margin: 1%;
+	padding: 1% 5% 1% 5%;
+}
+
+.LinkBox a {
+	color: #ffffff;
+	font-size: 1.2em;
+	text-decoration: none;
+}
+
+.LinkBox p {
+	text-align: justify;
+}
+
+.Date {
+	font-size: 0.8em;
+}
+
+a:hover {
+	font-weight: bolder;
+}
+
+body {
+	background-color: #000000;
+	/*font-family: "Lucida Console", Monaco, monospace;*/
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}

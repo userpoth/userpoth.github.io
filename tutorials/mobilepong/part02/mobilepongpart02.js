@@ -2,7 +2,7 @@
 /* mobilepongpart01.js. Frank Poth. 08/26/2015. */
 /////////////////////////////////////////////////
 
-/* So, in this example I plan on adding paddles and a score and maybe sound, so basically the game will be playable when I'm through. */
+/* So, in this example I plan on adding paddles and a score, so basically the game will be playable when I'm through. */
 /* It's all really simple stuff. */
 
 (
@@ -23,30 +23,6 @@
 
 		Ball.prototype = {
 			/* FUNCTIONS. */
-			/* Collides this ball with a paddle. */
-			collidePaddles : function() {
-				if (this.current_position.y > paddle_.current_position.y + paddle_.height || this.current_position.y + this.height < paddle_.current_position.y) {
-					return false;
-				}
-
-				/* If the above if statement didn't evaluate to true, then there is a collision! */
-				/* Handle it the exact same way you handle collision with the walls. */
-				var wall_normal = new Vector(1, 0);
-				var ball_vector = new Vector(this.current_position.x - this.last_position.x, this.current_position.y - this.last_position.y);
-
-				var reflection_x = ball_vector.x - 2 * (ball_vector.getDotProduct(wall_normal)) * wall_normal.x;
-				var reflection_y = ball_vector.y - 2 * (ball_vector.getDotProduct(wall_normal)) * wall_normal.y;
-
-				this.direction = Math.atan2(reflection_y, reflection_x);
-				/* The only difference is how to offset the ball. */
-				/* You know if it's moving left it's colliding with the left paddle and if it's moving right it's colliding with the right paddle. */
-				if (this.current_position.x < this.last_position.x) {
-					this.current_position.x = this.last_position.x = paddle_.current_position.x + paddle_.width;
-				} else {
-					this.current_position.x = this.last_position.x = paddle_.current_position.x - this.width;
-				}
-				this.velocity += 0.1;
-			},
 			draw : function(time_step_) {
 				var interpolated_x = this.last_position.x + (this.current_position.x - this.last_position.x) * time_step_;
 				var interpolated_y = this.last_position.y + (this.current_position.y - this.last_position.y) * time_step_;
@@ -248,7 +224,6 @@
 						accumulated_time -= interval_;
 						game.update();
 					}
-
 				})();
 
 				(function render(time_stamp_) {

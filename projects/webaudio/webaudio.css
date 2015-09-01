@@ -1,0 +1,48 @@
+/******************************************/
+/* webaudio.css. Frank Poth. 09/01/2015. */
+/****************************************/
+
+#toggle_audio_button {
+	align-items: center;
+	background-color: #303030;
+	border-color: #f0f0f0;
+	border-radius: 32px;
+	border-style: solid;
+	border-width: 2px;
+	color: #f0f0f0;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	margin: 0;
+	/*overflow:hidden;*/
+	padding: 2%;
+	text-align: center;
+	user-select: none;
+	/* Prevents the text from wrapping when screen orientation changes on mobile. */
+	white-space: nowrap;
+	z-index:100;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-user-select: none;
+}
+
+#toggle_audio_button:hover {
+	background-color: #606060;
+	font-weight: bolder;
+}
+
+body {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+html {
+	height: 100%;
+	width: 100%;
+}

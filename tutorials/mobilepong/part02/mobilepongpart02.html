@@ -30,13 +30,22 @@
 		<div id="content">
 			<h2>Part2</h2>
 			<p>
-				Well, Part two is a little lack luster in comparison to the last two tutorials. Not much has changed, but I did add some paddles and they're fully equipped with the same collision technique used on the walls. Everything is pretty straight forward in the source code, so I suggest you take a look! Also, take a look at the example, which is Pong! <span id="launch_button">Launch Example</span>
+				Well, Part2 is a pretty easy leap from Part1. There isn't much new code, but I did move some code around in the source, so take a look at it. Functionally, it's the same, though. One thing I did change is a line in the collision code that gets the movement vector of the ball. I was using the ball's current and last position to calculate it's movement vector, which works fine, until the ball hits a wall and both values are set to the same thing. When this happens the movement vector zeros out. If the ball then collides with a paddle, it's movement vector will be zero, which will cause a glitch and send the ball off course. The new code looks like this:
+			</p>
+			<pre>var ball_vector = new Vector(Math.cos(ball_.direction) * ball_.velocity, Math.sin(ball_.direction) * ball_.velocity);</pre>
+			<p>
+				Anyway, that cleared up a glitch. If you want to see the old code, I didn't change the last tutorial because for what it does it works just fine.
+			</p>
+			<p>
+				Other than that, adding paddles was pretty easy. The paddle class is simpler than the ball class, so if you're curious take a look at the source. Score keeping was also super simple. Basically, if the ball goes off screen, give the opposite player a point. The score is drawn right onto the canvas using the fillText function.
+			</p>
+			<p>
+				And that's all for this tutorial series. You now have access to all the code and explainations for the more complex logic behind making a Pong game! See it in action: <span id="launch_button">Launch Example</span>!
 			</p>
 		</div>
 		<div id="bottom_links">
 			<a href="../part01/mobilepongpart01.html">Part1</a>
 			<a href="../index.html">Index</a>
-			<a href="../part03/mobilepongpart03.html">Part3</a>
 		</div>
 		<div id="footer">
 			<a href="https://github.com/userpoth/userpoth.github.io/tree/master/tutorials/mobilepong">Github Repository</a>
