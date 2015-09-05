@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<!----------------------------------------->
+<!-- webgl.html. Frank Poth. 09/02/2015. -->
+<!----------------------------------------->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<meta charset="UTF-8">
+		<meta content="width=device-width" name="viewport">
+		<meta content="Test WebGL vs normal HTML5 Canvas">
+		<link href="webgl.css" rel="stylesheet" type="text/css">
+
+		<title>webgl</title>
+
+		<script id="fragment_shader" type="text">
+			precision mediump float;
+			uniform vec4 u_color;
+
+			void  main() {
+			gl_FragColor = u_color;
+			}
+		</script>
+		<script id="vertex_shader" type="text">
+			attribute vec2 a_position;
+			uniform vec2 u_resolution;
+
+			void  main() {
+			vec2 zeroToOne = a_position / u_resolution;
+
+			vec2 zeroToTwo = zeroToOne * 2.0;
+
+			vec2 clipSpace = zeroToTwo - 1.0;
+
+			gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+			}
+		</script>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<canvas id="canvas">
+			Browser doesn't suppport canvas.
+		</canvas>
+		<canvas id="gl_canvas">
+			&nbsp;
+		</canvas>
+		<div id="container">
+			<div class="Button" id="subtract_button">
+				Do Nothing
+			</div>
+			<div class="Button" id="toggle_method_button">
+				Canvas
+			</div>
+			<div class="Button" id="add_button">
+				Add 100
+			</div>
+		</div>
+		<p id="output">
+			squares: 0
+		</p>
+		<script src="webgl.js" type="text/javascript"></script>
+	</body>
+</html>

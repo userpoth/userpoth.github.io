@@ -1,0 +1,80 @@
+/***************************************/
+/* webgl.css. Frank Poth. 09/02/2015. */
+/*************************************/
+
+#canvas {
+	display: none;
+	left: 0px;
+	position: fixed;
+	top: 0px;
+}
+
+#gl_canvas {
+	display: none;
+	left: 0px;
+	position: fixed;
+	top: 0px;
+}
+
+#container {
+	align-items: center;
+	display: flex;
+	height: 10%;
+	justify-content: center;
+	left: 0px;
+	margin: 0;
+	padding: 0;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+}
+
+#output {
+	bottom: 0px;
+	color: #808080;
+	left: 0px;
+	margin: 0;
+	padding: 0;
+	position: fixed;
+}
+
+.Button {
+	align-items: center;
+	background-color: #303030;
+	border-color: #f0f0f0;
+	border-radius: 16px;
+	border-style: solid;
+	border-width: 2px;
+	box-sizing: border-box;
+	color: #f0f0f0;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	margin: 0 auto 0 auto;
+	padding: 2% 4% 2% 4%;
+	white-space: nowrap;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-user-select: none;
+}
+
+.Button:hover {
+	background-color: #606060;
+	font-weight: bolder;
+}
+
+body {
+	background-color: #303030;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+html {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
