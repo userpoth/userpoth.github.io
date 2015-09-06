@@ -30,18 +30,65 @@
 		<div id="content">
 			<h2>Part2</h2>
 			<p>
-				Well, Part2 is a pretty easy leap from Part1. There isn't much new code, but I did move some code around in the source, so take a look at it. Functionally, it's the same, though. One thing I did change is a line in the collision code that gets the movement vector of the ball. I was using the ball's current and last position to calculate it's movement vector, which works fine, until the ball hits a wall and both values are set to the same thing. When this happens the movement vector zeros out. If the ball then collides with a paddle, it's movement vector will be zero, which will cause a glitch and send the ball off course. The new code looks like this:
-			</p>
-			<pre>var ball_vector = new Vector(Math.cos(ball_.direction) * ball_.velocity, Math.sin(ball_.direction) * ball_.velocity);</pre>
-			<p>
-				Anyway, that cleared up a glitch. If you want to see the old code, I didn't change the last tutorial because for what it does it works just fine.
+				In this example I added some pretty simple stuff to the program. There's a new Paddle class and I modified the wall collision a little bit and used it to handle ball/paddle collision. Also, there's sound thanks to the Web Audio API! Before I get into the sound, let me clear up one thing about getting the ball's movement vector for collision.
 			</p>
 			<p>
-				Other than that, adding paddles was pretty easy. The paddle class is simpler than the ball class, so if you're curious take a look at the source. Score keeping was also super simple. Basically, if the ball goes off screen, give the opposite player a point. The score is drawn right onto the canvas using the fillText function.
+				In the last example I used this code to get the ball's movement vector:
+			</p>			<pre>
+var ball_vector = new Vector(ball.current_position.x - ball.last_position.x, ball.current_position.y - ball.last_position.y);
+</pre>
+<p>				This works fine, but it's abusing current and last position, which should only really be used for interpolating draw positions. When the ball hits a wall both of these values are set to the same thing so the draw function renders the ball touching the edge of the screen with zero interpolation. This looks good to the user, but isn't necessarily logical. As it turns out, if more than one collision occurs at the same time, the ball's movement vector will be zero for the second collision and this creates an unsightly glitch. To fix this problem, get the ball's movement vector like this:
+			</p>			<pre>
+var ball_vector = new Vector(Math.cos(ball_.direction) * ball_.velocity, Math.sin(ball_.direction) * ball_.velocity);
+</pre>
+<p>				This approach is the right way to get the movement vector and won't give you any glitches.
 			</p>
 			<p>
-				And that's all for this tutorial series. You now have access to all the code and explainations for the more complex logic behind making a Pong game! See it in action: <span id="launch_button">Launch Example</span>!
+				I suppose I could go into the math behind each paddle, but I think it's pretty straight forward. It's the same formula for getting collision and response with the walls applied to each paddle. Make sure to use the new method mentioned above to get the ball's movement vector, though. Anyway, on to the sound effects.
 			</p>
+			<p>
+				The Web Audio API is pretty safe to use in browsers these days, and it's way better than stand alone HTML5 audio. It's also a little more complex, but it's worth the bit of extra work to get it running. Here's how to get a handle on the AudioContext object:
+			</p>			<pre>
+var context = new (window.AudioContext || window.webkitAudioContext)();
+</pre>
+<p>				Hopefully one of these constructors works. This shouldn't be a problem in modern browsers. Next we need to load in a sound:
+			</p>			<pre>
+var buffer=undefined;
+
+var loadSound = function(url_, index_) {
+	var request = new XMLHttpRequest();
+	request.open("GET", url_, true);
+	request.responseType = "arraybuffer";
+
+	request.addEventListener("load", function(event_) {
+		context.decodeAudioData(this.response, function(audio_buffer_) {
+			buffer = audio_buffer_;
+		}, function() {
+			alert("Error decoding audio data");
+		});
+	});
+
+	request.send();
+}
+</pre>
+<p>				The Web Audio API uses XMLHttpRequest to load sound. It's pretty straight forward: make a request object, open a stream to the specified url, set how we want to get the information back, and add a listener to handle the information when it loads. That's your basic XMLHttpRequest. Inside the load event handler is where we deal with the audio.
+			</p>
+			<p>
+				decodeAudioData is what we use to decode the information taken from the XMLHttpRequest's response in the form of an array buffer. The first parameter is the response object, the second is a simple function that stores the decoded information into a variable, and the third is an error handler. The buffer variable will now hold the audio buffer object. To play the sound, we need to create a source:
+			</p>			<pre>
+var source = context.createBufferSource();
+source.buffer = buffer;
+source.connect(context.destination);
+source.loop = false;
+source.start(0);
+</pre>
+<p>				The code above creates a source object for playing sound, sets its buffer to the sound buffer we loaded, connects the source to the audio context's destination (which is whatever program handles the actual output to speakers), sets looping to false so the sound only plays once, and finally starts playback at 0ms.
+			</p>
+			<p>
+				And that's that. A little more code than plain HTML5 audio, but it's definitely more responsive and offers a lot more functionality. Check out the source code to get a better idea of how to implement this technique!
+			</p>
+			
+			<p><span id="launch_button">Launch Example</span>!</p>
 		</div>
 		<div id="bottom_links">
 			<a href="../part01/mobilepongpart01.html">Part1</a>

@@ -35,6 +35,9 @@
 				this.current_position.y = this.last_position.y = game.height * 0.5 - this.height * 0.5;
 				this.direction = Math.random() * Math.PI * 0.5 - Math.PI * 0.25 + additional_rotation_;
 				this.velocity = 2;
+				
+				/* If you're resetting the ball, this means the ball went out of bounds. Play the die sound. */
+				audio.playSound(0,0,false);
 			},
 			update : function() {
 				this.last_position.x = this.current_position.x;
@@ -202,6 +205,52 @@
 		///////////////////////
 		/* OBJECT LITERALS. */
 		/////////////////////
+		
+		/* This will basically handle everything to do with the Web Audio API and just own like a boss at managing sound. */
+		var audio = {
+			/* FUNCTIONS. */
+			/* Loads the sound at the url into the buffers array at the specified index. */
+			loadSound : function(url_, index_) {
+				/* Web Audio API uses XMLHTTPRequests to load sound. */
+				var request = new XMLHttpRequest();
+				request.open("GET", url_, true);
+				request.responseType = "arraybuffer";
+
+				request.addEventListener("load", function(event_) {
+					/* this.response is the audio_data. Then there's the function to access the decoded data, then there's an error handler. */
+					audio.context.decodeAudioData(this.response, function(audio_buffer_) {
+						/* I'm using an array to store all my loaded audio buffers. */
+						/* Later on I can acces them by index. */
+						audio.buffers[index_] = audio_buffer_;
+					}, function() {
+						alert("Error decoding audio data");
+					});
+				});
+
+				request.send();
+			},
+			/* Plays a sound. */
+			/* A new source must be generated every time you want to play one of your sounds. */
+			playSound : function(index_, time_, loop_) {
+				var source = this.context.createBufferSource();
+				source.buffer = this.buffers[index_];
+				source.connect(this.context.destination);
+				source.loop = loop_;
+				source.start(time_);
+				this.sources[index_] = source;
+			},
+			stopSound : function(index_, time_) {
+				this.sources[index_].stop(time_);
+			},
+			/* VARIABLES. */
+
+			/* Holds all the buffers. */
+			buffers : [],
+			/* The audio context. */
+			context : new (window.AudioContext || window.webkitAudioContext)(),
+			/* Holds all sources. */
+			sources : []
+		};
 
 		var engine = {
 			/* FUNCTIONS. */
@@ -259,6 +308,9 @@
 				ball_.direction = Math.atan2(reflection_y, reflection_x);
 				ball_.current_position.x = ball_.last_position.x = x_;
 				ball_.velocity += 0.1;
+				
+				/* Play the pong sound! Pong as in phoenetics, not as in Pong. */
+				audio.playSound(1,0,false);
 			},
 			/* I put the collide wall code into a handy function. It saves space and I made some revisions to the code to prevent a nasty glitch. */
 			collideWall : function(ball_, y_) {
@@ -274,6 +326,9 @@
 				ball_.direction = Math.atan2(reflection_y, reflection_x);
 				ball_.current_position.y = ball_.last_position.y = y_;
 				ball_.velocity += 0.1;
+				
+				/* Play the ping sound! */
+				audio.playSound(2,0,false);
 			},
 			draw : function(time_step_) {
 				buffer.fillStyle = this.fill_style;
@@ -379,6 +434,11 @@
 		buffer.canvas.width = game.width;
 		buffer.font = "20px Arial";
 		buffer.textAlign = "center";
+		
+		/* Load the sounds. */
+		audio.loadSound("die.mp3",0);
+		audio.loadSound("pong.mp3",1);
+		audio.loadSound("ping.mp3",2);
 
 		game.start();
 	})();
