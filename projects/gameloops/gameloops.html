@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+
+<!--------------------------------------------->
+<!-- gameloops.html. Frank Poth. 09/07/2015. -->
+<!--------------------------------------------->
+
+<!-- HTML. -->
+<html>
+	<!-- Head. -->
+	<head>
+		<meta charset="UTF-8">
+
+		<link href="gameloops.css" rel="stylesheet" type="text/css">
+
+		<meta name="viewport" content="width=device-width">
+		<title>gameloops</title>
+	</head>
+
+	<!-- Body. -->
+	<body>
+		<canvas id="canvas">
+			Browser isn't HTML5 compatible.
+		</canvas>
+		<div id="controls">
+			<button class="Button" id="render_button">
+				-20/+20
+			</button>
+			<button class="Button" id="toggle_loop_button">
+				raf loop
+			</button>
+			<button class="Button" id="update_button">
+				-250000/+250000
+			</button>
+		</div>
+		<p id="output">
+			output:
+		</p>
+		<script src="gameloops.js" type="text/javascript"></script>
+	</body>
+</html>

@@ -72,11 +72,7 @@
 	top: 0px;
 	z-index: -1;
 }
-#footer {
-	bottom: 0px;
-	height: 10%;
-	position: fixed;
-}
+
 #header {
 	align-items: center;
 	display: flex;
@@ -88,6 +84,7 @@
 	top: 0px;
 	width: 100%;
 }
+
 body {
 	background-color: #f0f0f0;
 	height: 100%;
@@ -95,4 +92,11 @@ body {
 	overflow: hidden;
 	padding: 0;
 	width: 100%;
+}
+
+html{
+	height:100%;
+	margin:0;
+	padding:0;
+	width:100%;
 }

@@ -1,0 +1,55 @@
+/*******************************************/
+/* gameloops.css. Frank Poth. 09/09/2015. */
+/*****************************************/
+
+#canvas {
+	left: 0px;
+	position: fixed;
+	top: 0px;
+}
+
+#controls{
+	align-items:center;
+	display:flex;
+	height:48px;
+	justify-content:center;
+	left:0px;
+	position:fixed;
+	top:0px;
+	width:100%;
+}
+
+#output{
+	color:#c0c0c0;
+	bottom:0px;
+	left:0px;
+	position:fixed;
+}
+
+.Button{
+	background-color:#303030;
+	border-color:#f0f0f0;
+	border-radius:16px;
+	border-style:solid;
+	box-sizing:content-box;
+	color:#f0f0f0;
+	height:32px;
+	margin:0;
+	padding:0;
+	width:120px;
+}
+
+body{
+	background-color:#303030;
+	height:100%;
+	margin:0;
+	padding:0;
+	width:100%;
+}
+
+html{
+	height:100%;
+	margin:0;
+	padding:0;
+	width:100%;
+}
